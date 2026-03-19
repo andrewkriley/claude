@@ -22,9 +22,10 @@ cd ~/dev/claude
 - Create `~/.claude/env.sh` from `env.sh.template` (secrets, never committed)
 - Add `env.sh` sourcing to `.zshrc` / `.bashrc`
 
-After running setup, fill in `~/.claude/env.sh` with tokens. For LinkedIn, run:
+After running setup, fill in `~/.claude/env.sh` with tokens. For LinkedIn and Webex, run:
 ```bash
 ./scripts/linkedin-oauth.sh
+./scripts/webex-oauth.sh
 ```
 
 ## Keeping machines in sync
@@ -46,7 +47,8 @@ claude/
 ├── settings.json.template          # MCP server config template
 ├── env.sh.template                 # Secrets template (never commit populated version)
 ├── scripts/
-│   └── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
+│   ├── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
+│   └── webex-oauth.sh              # One-time Webex OAuth setup
 └── skills/
     ├── new-post-andrewriley-info/  # Hugo blog post creation pipeline
     ├── linkedin-post/              # LinkedIn draft + publish
