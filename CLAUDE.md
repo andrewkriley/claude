@@ -52,6 +52,7 @@ claude/
     ├── linkedin-post/              # LinkedIn draft + publish
     ├── summarise-session/          # End-of-session summary
     ├── grill-me/                   # Deep design interview skill
+    ├── webex-update/               # Send a session update to a Webex room
     └── skills/                     # List all available skills
 ```
 
@@ -109,4 +110,5 @@ Gmail, Google Calendar, HuggingFace, and Slack MCP servers are authenticated via
 | `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
 | `summarise-session` | `/summarise-session` | Summarise the current session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview |
+| `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
 | `skills` | `/skills` | List all available skills |
