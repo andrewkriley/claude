@@ -12,9 +12,11 @@ This repo is the canonical source of truth for `~/.claude/` across all workstati
 claude/
 ├── setup.sh                        # Bootstrap script (macOS + Ubuntu)
 ├── PROFILE.md                      # Voice/identity profile for content skills
-├── settings.json.template          # MCP server config template
+├── settings.json.template          # MCP server config + plugin marketplace template
 ├── env.sh.template                 # Secrets template (never commit populated version)
 ├── .gitleaks.toml                  # Gitleaks config — allowlists known false positives
+├── .claude/
+│   └── settings.json               # Project-scoped plugin marketplace config
 ├── scripts/
 │   ├── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
 │   └── webex-oauth.sh              # One-time Webex OAuth setup
@@ -116,6 +118,40 @@ Skills are invoked inside Claude Code with `/skill-name`. They are symlinked fro
 
 ---
 
+## Plugins
+
+Claude Code plugins extend the editor with skills, agents, hooks, and MCP servers. Plugin marketplaces are registered via `extraKnownMarketplaces` in `settings.json.template` (user-level) and `.claude/settings.json` (project-level), so they are available on every machine after `setup.sh`.
+
+### Installed marketplaces
+
+| Marketplace | Source | Contents |
+|---|---|---|
+| `cloudflare` | `cloudflare/skills` | Skills for Workers, Pages, D1, R2, KV, Durable Objects, Agents SDK, MCP, Wrangler, and web perf |
+
+After cloning, activate plugins in Claude Code:
+
+```bash
+/plugin marketplace add cloudflare/skills
+/plugin install cloudflare@cloudflare
+/reload-plugins
+```
+
+### Available Cloudflare skills (after install)
+
+| Skill | Invoke | Purpose |
+|---|---|---|
+| `cloudflare` | `/cloudflare:cloudflare` | Full Cloudflare platform overview |
+| `build-agent` | `/cloudflare:build-agent` | Build an AI agent using Agents SDK |
+| `build-mcp` | `/cloudflare:build-mcp` | Build a remote MCP server with OAuth |
+| `agents-sdk` | `/cloudflare:agents-sdk` | Stateful agents, WebSockets, scheduled tasks |
+| `durable-objects` | `/cloudflare:durable-objects` | Durable Objects with RPC, SQLite, alarms |
+| `workers-best-practices` | `/cloudflare:workers-best-practices` | Workers code review and authoring |
+| `wrangler` | `/cloudflare:wrangler` | Wrangler CLI reference |
+| `sandbox-sdk` | `/cloudflare:sandbox-sdk` | Sandboxed code execution |
+| `web-perf` | `/cloudflare:web-perf` | Core Web Vitals and Lighthouse auditing |
+
+---
+
 ## MCP servers
 
 ### Local (synced via this repo)
@@ -124,6 +160,10 @@ Configured in `settings.json.template`, applied by `setup.sh`:
 
 - **filesystem** — gives Claude Code access to `~/dev/`
 - **github** — GitHub API access via `GITHUB_TOKEN`
+
+### Plugin MCP servers (cloudflare marketplace)
+
+Installed with the `cloudflare` plugin — provides live Cloudflare documentation search and Pages → Workers migration guidance.
 
 ### claude.ai-managed (not syncable)
 
