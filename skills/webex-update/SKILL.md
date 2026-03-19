@@ -17,20 +17,31 @@ if [ -z "$WEBEX_TOKEN" ]; then echo "WEBEX_TOKEN=missing"; else echo "WEBEX_TOKE
 
 If `WEBEX_TOKEN` is missing, stop and tell the user to add it to `~/.claude/env.sh`.
 
-## Step 1 — Find the target room
+## Step 1 — Find the target
 
-Ask the user: "Which Webex room would you like to send this to? Give me part of the room name to search."
+Ask the user: "Who or which room would you like to send this to? Give me part of a name to search."
 
-Once they respond, use the Bash tool to search for matching rooms:
+Once they respond, search both rooms and people in parallel using the Bash tool:
 
+**Rooms** (spaces the bot is a member of):
 ```bash
 source $HOME/.claude/env.sh
 curl -s -H "Authorization: Bearer $WEBEX_TOKEN" \
   "https://webexapis.com/v1/rooms?max=100" | \
-  jq --arg q "<search term>" '[.items[] | select(.title | ascii_downcase | contains($q | ascii_downcase)) | {id, title, type}]'
+  jq --arg q "<search term>" '[.items[] | select(.title | ascii_downcase | contains($q | ascii_downcase)) | {target: .title, id: .id, type: "room"}]'
 ```
 
-Present the matching rooms as a numbered list and ask the user to pick one. If no rooms match, ask for a different search term.
+**People** (Webex directory search):
+```bash
+source $HOME/.claude/env.sh
+curl -s -H "Authorization: Bearer $WEBEX_TOKEN" \
+  "https://webexapis.com/v1/people?displayName=<search term>&max=10" | \
+  jq '[.items[] | {target: .displayName, id: .id, email: .emails[0], type: "person"}]'
+```
+
+Combine the results and present as a numbered list, labelling each as **room** or **person**. Ask the user to pick one. If nothing matches, ask for a different search term.
+
+When sending to a **person**, use `toPersonId` instead of `roomId` in the message payload.
 
 ## Step 2 — Gather session context
 
@@ -59,8 +70,9 @@ Show the draft to the user and ask: "Happy with this? I'll send it to **<room na
 
 ## Step 4 — Send the message
 
-Once confirmed, send using the Bash tool:
+Once confirmed, send using the Bash tool.
 
+For a **room**:
 ```bash
 source $HOME/.claude/env.sh
 curl -s -X POST \
@@ -68,6 +80,16 @@ curl -s -X POST \
   -H "Content-Type: application/json" \
   https://webexapis.com/v1/messages \
   -d "{\"roomId\": \"<room_id>\", \"markdown\": \"<message>\"}"
+```
+
+For a **person**:
+```bash
+source $HOME/.claude/env.sh
+curl -s -X POST \
+  -H "Authorization: Bearer $WEBEX_TOKEN" \
+  -H "Content-Type: application/json" \
+  https://webexapis.com/v1/messages \
+  -d "{\"toPersonId\": \"<person_id>\", \"markdown\": \"<message>\"}"
 ```
 
 Confirm success with: "Sent to **<room name>**."
