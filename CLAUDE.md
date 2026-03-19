@@ -72,11 +72,15 @@ All skills use `$HOME`-relative paths. Every machine must follow this layout:
 
 ## MCP servers
 
+### Local (synced via this repo)
+
 Configured in `settings.json.template`, applied by `setup.sh`:
 - **filesystem** — access to `~/dev/`
 - **github** — GitHub API access (requires `GITHUB_TOKEN` in `env.sh`)
 
-> **TODO:** Investigate whether claude.ai MCP config (Gmail, Google Calendar, HuggingFace, Slack) can be exported and synced via this repo.
+### claude.ai-managed (not syncable)
+
+Gmail, Google Calendar, HuggingFace, and Slack MCP servers are authenticated via **claude.ai's cloud OAuth** and tied to the claude.ai account — not to individual machines. They are configured at claude.ai/settings and automatically available in every Claude Code session without any local setup. There is nothing to sync here.
 
 ## Skills quick reference
 
