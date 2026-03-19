@@ -1,0 +1,11 @@
+# Gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "Claude Resources — Gitleaks Config"
+
+[allowlist]
+  description = "Allowlisted false positives"
+  regexes = [
+    # Placeholder string in settings.json.template — not a real token
+    "GITHUB_TOKEN_PLACEHOLDER",
+  ]
