@@ -22,6 +22,7 @@ claude/
 │   ├── linkedin-post/              # LinkedIn draft + publish
 │   ├── summarise-session/          # End-of-session summary
 │   ├── grill-me/                   # Deep design interview skill
+│   ├── webex-update/               # Send a session update to a Webex room
 │   └── skills/                     # List all available skills
 └── .github/
     └── workflows/
@@ -51,6 +52,9 @@ After setup, fill in `~/.claude/env.sh` with your tokens:
 ```bash
 # Required
 GITHUB_TOKEN=...        # Fine-grained PAT — see GitHub PAT section below
+
+# For Webex session updates
+WEBEX_TOKEN=...         # Webex bot token
 
 # For LinkedIn publishing
 LINKEDIN_CLIENT_ID=...
@@ -102,6 +106,7 @@ Skills are invoked inside Claude Code with `/skill-name`. They are symlinked fro
 | `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
 | `summarise-session` | `/summarise-session` | Summarise the current working session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview for plans and projects |
+| `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
 | `skills` | `/skills` | List all available skills |
 
 ---
