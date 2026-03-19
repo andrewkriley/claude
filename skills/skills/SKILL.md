@@ -6,17 +6,7 @@ argument-hint: [optional: filter keyword]
 
 You are listing all available Claude Code skills for Andrew Riley.
 
-## Available skills
-
-```
-!`ls $HOME/.claude/skills/ 2>/dev/null | sort`
-```
-
-## Skill details
-
-```
-!`for skill_dir in $HOME/.claude/skills/*/; do skill=$(basename "$skill_dir"); skill_file="$skill_dir/SKILL.md"; if [ -f "$skill_file" ]; then name=$(grep '^name:' "$skill_file" | head -1 | sed 's/name: //'); desc=$(grep '^description:' "$skill_file" | head -1 | sed 's/description: //'); hint=$(grep '^argument-hint:' "$skill_file" | head -1 | sed 's/argument-hint: //'); echo "/$name — $desc"; [ -n "$hint" ] && echo "  Usage: /$name $hint"; echo; fi; done`
-```
+Use the Glob tool to find all `SKILL.md` files under `~/.claude/skills/`, then Read each one to extract the `name:`, `description:`, and `argument-hint:` frontmatter fields.
 
 ## Filter
 
@@ -30,5 +20,11 @@ Present the skills as a clean formatted list. Group them by category if there ar
 - **Content** — blog/LinkedIn/writing skills
 - **Scaffold** — project creation skills
 - **Workflow** — session and productivity skills
+
+For each skill show:
+```
+/name — description
+  Usage: /name argument-hint   (only if argument-hint is present)
+```
 
 If `$ARGUMENTS` was provided and no skills match, say so and suggest the closest match.
