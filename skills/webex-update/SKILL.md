@@ -8,11 +8,14 @@ You are sending a Webex session update message on behalf of Andrew Riley.
 
 ## Environment check
 
-```
-!`source $HOME/.claude/env.sh 2>/dev/null; echo "WEBEX_TOKEN=${WEBEX_TOKEN:+set}"`
+Use the Bash tool to verify the token is available:
+
+```bash
+source $HOME/.claude/env.sh 2>/dev/null
+if [ -z "$WEBEX_TOKEN" ]; then echo "WEBEX_TOKEN=missing"; else echo "WEBEX_TOKEN=set"; fi
 ```
 
-If `WEBEX_TOKEN` is not set, stop and tell the user to add it to `~/.claude/env.sh`.
+If `WEBEX_TOKEN` is missing, stop and tell the user to add it to `~/.claude/env.sh`.
 
 ## Step 1 — Find the target room
 

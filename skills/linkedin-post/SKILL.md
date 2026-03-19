@@ -8,11 +8,15 @@ You are drafting a LinkedIn post for Andrew Riley.
 
 ## Environment
 
-```
-!`source $HOME/.claude/env.sh 2>/dev/null; echo "LINKEDIN_TOKEN=${LINKEDIN_TOKEN:+set}"; echo "LINKEDIN_PERSON_URN=${LINKEDIN_PERSON_URN}"`
+Use the Bash tool to verify credentials are available:
+
+```bash
+source $HOME/.claude/env.sh 2>/dev/null
+if [ -z "$LINKEDIN_TOKEN" ]; then echo "LINKEDIN_TOKEN=missing"; else echo "LINKEDIN_TOKEN=set"; fi
+echo "LINKEDIN_PERSON_URN=$LINKEDIN_PERSON_URN"
 ```
 
-If `LINKEDIN_TOKEN` is not set, stop and tell the user to run `$HOME/dev/claude/scripts/linkedin-oauth.sh` first to complete OAuth setup.
+If `LINKEDIN_TOKEN` is missing, stop and tell the user to run `$HOME/dev/claude/scripts/linkedin-oauth.sh` first to complete OAuth setup.
 
 ## Author profile
 
