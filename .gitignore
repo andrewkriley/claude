@@ -1,0 +1,10 @@
+# Machine-specific secrets — never commit
+env.sh
+*.env
+.env
+
+# macOS
+.DS_Store
+
+# Generated settings (produced by setup.sh from template)
+# settings.json is intentionally NOT gitignored — the template version is committed

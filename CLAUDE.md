@@ -1,0 +1,92 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this repo is
+
+A portable Claude resource library — skills, profile, MCP config, and scripts — synced via Git and applied to any machine running Claude Code. Canonical source of truth for `~/.claude/` across all workstations.
+
+## Setup a new machine
+
+```bash
+git clone https://github.com/andrewkriley/claude.git ~/dev/claude
+cd ~/dev/claude
+./setup.sh
+```
+
+`setup.sh` supports macOS and Ubuntu. It will:
+- Clone the blog repo to `~/dev/www-andrewriley-info`
+- Symlink `skills/` → `~/.claude/skills/`
+- Symlink `PROFILE.md` → `~/.claude/PROFILE.md`
+- Generate `~/.claude/settings.json` from `settings.json.template`
+- Create `~/.claude/env.sh` from `env.sh.template` (secrets, never committed)
+- Add `env.sh` sourcing to `.zshrc` / `.bashrc`
+
+After running setup, fill in `~/.claude/env.sh` with tokens. For LinkedIn, run:
+```bash
+./scripts/linkedin-oauth.sh
+```
+
+## Keeping machines in sync
+
+```bash
+# On the machine where you made changes:
+git add -A && git commit -m "..." && git push
+
+# On other machines:
+git pull && ./setup.sh
+```
+
+## Repository structure
+
+```
+claude/
+├── setup.sh                        # Bootstrap script (macOS + Ubuntu)
+├── PROFILE.md                      # Voice/identity profile for content skills
+├── settings.json.template          # MCP server config template
+├── env.sh.template                 # Secrets template (never commit populated version)
+├── scripts/
+│   └── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
+└── skills/
+    ├── new-post-andrewriley-info/  # Hugo blog post creation pipeline
+    ├── linkedin-post/              # LinkedIn draft + publish
+    ├── summarise-session/          # End-of-session summary
+    ├── grill-me/                   # Deep design interview skill
+    ├── splunk-scaffold/            # Splunk project scaffold
+    ├── homelab-scaffold/           # Homelab project scaffold
+    ├── worklab-scaffold/           # Work lab project scaffold
+    └── skills/                     # List all available skills
+```
+
+## Path conventions
+
+All skills use `$HOME`-relative paths. Every machine must follow this layout:
+
+| Path | Contents |
+|---|---|
+| `~/dev/claude` | This repo |
+| `~/dev/www-andrewriley-info` | Hugo blog repo |
+| `~/.claude/skills/` | Symlink → `~/dev/claude/skills/` |
+| `~/.claude/PROFILE.md` | Symlink → `~/dev/claude/PROFILE.md` |
+| `~/.claude/env.sh` | Machine-specific secrets (gitignored) |
+
+## MCP servers
+
+Configured in `settings.json.template`, applied by `setup.sh`:
+- **filesystem** — access to `~/dev/`
+- **github** — GitHub API access (requires `GITHUB_TOKEN` in `env.sh`)
+
+> **TODO:** Investigate whether claude.ai MCP config (Gmail, Google Calendar, HuggingFace, Slack) can be exported and synced via this repo.
+
+## Skills quick reference
+
+| Skill | Invoke | Purpose |
+|---|---|---|
+| `new-post-andrewriley-info` | `/new-post-andrewriley-info` | Write and publish a Hugo blog post |
+| `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
+| `summarise-session` | `/summarise-session` | Summarise the current session |
+| `grill-me` | `/grill-me [topic]` | Deep design interview |
+| `splunk-scaffold` | `/splunk-scaffold [name]` | Scaffold a Splunk project |
+| `homelab-scaffold` | `/homelab-scaffold [name]` | Scaffold a homelab project |
+| `worklab-scaffold` | `/worklab-scaffold [name]` | Scaffold a work lab project |
+| `skills` | `/skills` | List all available skills |
