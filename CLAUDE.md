@@ -52,9 +52,6 @@ claude/
     ├── linkedin-post/              # LinkedIn draft + publish
     ├── summarise-session/          # End-of-session summary
     ├── grill-me/                   # Deep design interview skill
-    ├── splunk-scaffold/            # Splunk project scaffold
-    ├── homelab-scaffold/           # Homelab project scaffold
-    ├── worklab-scaffold/           # Work lab project scaffold
     └── skills/                     # List all available skills
 ```
 
@@ -69,6 +66,28 @@ All skills use `$HOME`-relative paths. Every machine must follow this layout:
 | `~/.claude/skills/` | Symlink → `~/dev/claude/skills/` |
 | `~/.claude/PROFILE.md` | Symlink → `~/dev/claude/PROFILE.md` |
 | `~/.claude/env.sh` | Machine-specific secrets (gitignored) |
+
+## GitHub PAT requirements
+
+The `GITHUB_TOKEN` in `env.sh` must be a **fine-grained PAT** scoped to the `andrewkriley/claude` repository with the following permissions:
+
+**Repository permissions:**
+
+| Permission | Access | Reason |
+|---|---|---|
+| Contents | Read & Write | Clone, push, pull, read files |
+| Administration | Read & Write | Branch protection rules |
+| Workflows | Read & Write | Push `.github/workflows/` files |
+| Metadata | Read | Required (auto-selected) |
+| Pull requests | Read & Write | Review and merge PRs |
+
+**Account permissions:**
+
+| Permission | Access | Reason |
+|---|---|---|
+| Email addresses | Read | GitHub MCP server user lookups |
+
+Generate at: `https://github.com/settings/personal-access-tokens/new`
 
 ## MCP servers
 
@@ -90,7 +109,4 @@ Gmail, Google Calendar, HuggingFace, and Slack MCP servers are authenticated via
 | `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
 | `summarise-session` | `/summarise-session` | Summarise the current session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview |
-| `splunk-scaffold` | `/splunk-scaffold [name]` | Scaffold a Splunk project |
-| `homelab-scaffold` | `/homelab-scaffold [name]` | Scaffold a homelab project |
-| `worklab-scaffold` | `/worklab-scaffold [name]` | Scaffold a work lab project |
 | `skills` | `/skills` | List all available skills |

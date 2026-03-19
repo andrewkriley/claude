@@ -22,9 +22,6 @@ claude/
 │   ├── linkedin-post/              # LinkedIn draft + publish
 │   ├── summarise-session/          # End-of-session summary
 │   ├── grill-me/                   # Deep design interview skill
-│   ├── splunk-scaffold/            # Splunk project scaffold
-│   ├── homelab-scaffold/           # Homelab project scaffold
-│   ├── worklab-scaffold/           # Work lab project scaffold
 │   └── skills/                     # List all available skills
 └── .github/
     └── workflows/
@@ -105,9 +102,6 @@ Skills are invoked inside Claude Code with `/skill-name`. They are symlinked fro
 | `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
 | `summarise-session` | `/summarise-session` | Summarise the current working session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview for plans and projects |
-| `splunk-scaffold` | `/splunk-scaffold [name]` | Scaffold a new Splunk project |
-| `homelab-scaffold` | `/homelab-scaffold [name]` | Scaffold a new homelab project |
-| `worklab-scaffold` | `/worklab-scaffold [name]` | Scaffold a new work lab project |
 | `skills` | `/skills` | List all available skills |
 
 ---
