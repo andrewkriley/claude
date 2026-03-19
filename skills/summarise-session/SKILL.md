@@ -10,22 +10,24 @@ You are summarising the current Claude Code working session for Andrew Riley.
 
 Current directory and git status:
 ```
-!`pwd && echo "---" && git status --short 2>/dev/null || echo "(not a git repo)"`
+!`pwd`
+!`git status --short 2>/dev/null`
 ```
 
 Recent commits:
 ```
-!`git log --oneline -15 2>/dev/null || echo "(no git history)"`
+!`git log --oneline -15 2>/dev/null`
 ```
 
 Files changed (staged and unstaged):
 ```
-!`git diff --name-only 2>/dev/null && git diff --name-only --cached 2>/dev/null`
+!`git diff --name-only 2>/dev/null`
+!`git diff --name-only --cached 2>/dev/null`
 ```
 
 Current date/time:
 ```
-!`date '+%Y-%m-%d %H:%M %Z'`
+!`date`
 ```
 
 ## Your task
