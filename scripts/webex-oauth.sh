@@ -20,6 +20,7 @@ echo "  3. Enable scopes: spark:messages_write, spark:people_read, spark:rooms_r
 echo ""
 
 # Load existing credentials from env.sh if present
+# shellcheck source=/dev/null
 source "$ENV_FILE" 2>/dev/null || true
 
 # Use stored values as defaults if already set
@@ -48,8 +49,8 @@ if [[ -z "$CLIENT_ID" || -z "$CLIENT_SECRET" ]]; then
 fi
 
 # Build the auth URL
-ENCODED_REDIRECT=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$REDIRECT_URI'))")
-ENCODED_SCOPE=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$SCOPE'))")
+ENCODED_REDIRECT=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$REDIRECT_URI', safe=''))")
+ENCODED_SCOPE=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$SCOPE', safe=':'))")
 AUTH_URL="https://webexapis.com/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${ENCODED_REDIRECT}&scope=${ENCODED_SCOPE}&state=claude_setup"
 
 echo ""
