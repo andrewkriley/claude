@@ -8,14 +8,33 @@ You are sending a Webex session update message on behalf of Andrew Riley.
 
 ## Environment check
 
-Use the Bash tool to verify the token is available:
+Use the Bash tool to verify credentials and refresh the token if needed:
 
 ```bash
 source $HOME/.claude/env.sh 2>/dev/null
 if [ -z "$WEBEX_TOKEN" ]; then echo "WEBEX_TOKEN=missing"; else echo "WEBEX_TOKEN=set"; fi
+if [ -z "$WEBEX_REFRESH_TOKEN" ]; then echo "WEBEX_REFRESH_TOKEN=missing"; else echo "WEBEX_REFRESH_TOKEN=set"; fi
 ```
 
-If `WEBEX_TOKEN` is missing, stop and tell the user to add it to `~/.claude/env.sh`.
+If `WEBEX_TOKEN` is missing, stop and tell the user to run `$HOME/dev/claude/scripts/webex-oauth.sh` first.
+
+If the token is set but an API call later returns a 401, use the Bash tool to refresh it:
+
+```bash
+source $HOME/.claude/env.sh
+RESPONSE=$(curl -s -X POST "https://webexapis.com/v1/access_token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "grant_type=refresh_token" \
+  --data-urlencode "client_id=$WEBEX_CLIENT_ID" \
+  --data-urlencode "client_secret=$WEBEX_CLIENT_SECRET" \
+  --data-urlencode "refresh_token=$WEBEX_REFRESH_TOKEN")
+NEW_TOKEN=$(echo "$RESPONSE" | jq -r '.access_token')
+NEW_REFRESH=$(echo "$RESPONSE" | jq -r '.refresh_token')
+echo "new_token=$NEW_TOKEN"
+echo "new_refresh=$NEW_REFRESH"
+```
+
+Then update `~/.claude/env.sh` with the new tokens using sed, and retry the failed request.
 
 ## Step 1 — Find the target
 
