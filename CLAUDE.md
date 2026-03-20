@@ -44,10 +44,11 @@ git pull && ./setup.sh
 claude/
 ├── setup.sh                        # Bootstrap script (macOS + Ubuntu)
 ├── PROFILE.md                      # Voice/identity profile for content skills
-├── settings.json.template          # MCP server config + plugin marketplace template
+├── settings.json.template          # MCP server config template
 ├── env.sh.template                 # Secrets template (never commit populated version)
 ├── .claude/
-│   └── settings.json               # Project-scoped plugin marketplace config
+│   ├── settings.json               # Project-scoped settings
+│   └── settings.local.json         # Project-scoped permissions (WebFetch, Bash)
 ├── scripts/
 │   ├── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
 │   └── webex-oauth.sh              # One-time Webex OAuth setup
@@ -94,22 +95,6 @@ The `GITHUB_TOKEN` in `env.sh` must be a **fine-grained PAT** scoped to the `and
 
 Generate at: `https://github.com/settings/personal-access-tokens/new`
 
-## Plugins
-
-Plugin marketplaces are registered in `settings.json.template` (user-level) and `.claude/settings.json` (project-level) via `extraKnownMarketplaces`. On a new machine, activate after `setup.sh`:
-
-```bash
-/plugin marketplace add cloudflare/skills
-/plugin install cloudflare@cloudflare
-/reload-plugins
-```
-
-### Plugin marketplaces
-
-| Marketplace | GitHub source | Purpose |
-|---|---|---|
-| `cloudflare` | `cloudflare/skills` | Cloudflare platform skills and MCP servers |
-
 ## MCP servers
 
 ### Local (synced via this repo)
@@ -117,10 +102,6 @@ Plugin marketplaces are registered in `settings.json.template` (user-level) and 
 Configured in `settings.json.template`, applied by `setup.sh`:
 - **filesystem** — access to `~/dev/`
 - **github** — GitHub API access (requires `GITHUB_TOKEN` in `env.sh`)
-
-### Plugin MCP servers
-
-The `cloudflare` plugin ships MCP servers for Cloudflare documentation search and Pages → Workers migration guidance. Available after installing the plugin.
 
 ### claude.ai-managed (not syncable)
 
