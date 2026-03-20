@@ -135,4 +135,4 @@ Gmail, Google Calendar, HuggingFace, and Slack MCP servers are authenticated via
 | `summarise-session` | `/summarise-session` | Summarise the current session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview |
 | `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
-| `skills` | `/skills` | List all available skills |
+| `skills` | `/skills` | List all available skills and configured MCP servers |

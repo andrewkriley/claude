@@ -114,7 +114,7 @@ Skills are invoked inside Claude Code with `/skill-name`. They are symlinked fro
 | `summarise-session` | `/summarise-session` | Summarise the current working session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview for plans and projects |
 | `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
-| `skills` | `/skills` | List all available skills |
+| `skills` | `/skills` | List all available skills and configured MCP servers |
 
 ---
 
