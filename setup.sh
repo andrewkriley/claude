@@ -165,6 +165,17 @@ else
     warn "  Skipping github MCP — GITHUB_TOKEN not set in $ENV_FILE"
   fi
 
+  # huggingface — requires HF_TOKEN
+  # Registered locally (without gradio=none) to enable dynamic_space invoke.
+  # The claude.ai-managed HF server uses gradio=none which blocks invoke.
+  if [[ -n "${HF_TOKEN:-}" ]]; then
+    register_mcp huggingface \
+      -- npx -y mcp-remote@0.1.38 "https://huggingface.co/mcp" \
+      --header "Authorization: Bearer ${HF_TOKEN}"
+  else
+    warn "  Skipping huggingface MCP — HF_TOKEN not set in $ENV_FILE"
+  fi
+
   # splunk-mcp-server — requires SPLUNK_HOST and SPLUNK_TOKEN
   # IMPORTANT: Must use stdio + mcp-remote (not --transport http).
   # Claude Code's HTTP transport cannot disable TLS cert verification.
@@ -182,6 +193,7 @@ fi
 
 MISSING=()
 [[ -z "${GITHUB_TOKEN:-}" ]]          && MISSING+=("GITHUB_TOKEN (required for GitHub MCP)")
+[[ -z "${HF_TOKEN:-}" ]]              && MISSING+=("HF_TOKEN (required for Hugging Face MCP — https://huggingface.co/settings/tokens)")
 [[ -z "${LINKEDIN_TOKEN:-}" ]]        && MISSING+=("LINKEDIN_TOKEN (run scripts/linkedin-oauth.sh)")
 [[ -z "${LINKEDIN_PERSON_URN:-}" ]]   && MISSING+=("LINKEDIN_PERSON_URN (run scripts/linkedin-oauth.sh)")
 [[ -z "${SPLUNK_HOST:-}" ]]           && MISSING+=("SPLUNK_HOST (required for Splunk MCP, e.g. 10.66.121.3)")

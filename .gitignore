@@ -8,3 +8,6 @@ env.sh
 
 # Generated settings (produced by setup.sh from template)
 # settings.json is intentionally NOT gitignored — the template version is committed
+
+# Generated dashboards — saved outside the repo at ~/dev/claude-created-dashboards/
+dashboards/
