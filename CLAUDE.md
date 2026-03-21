@@ -60,7 +60,8 @@ claude/
     ├── grill-me/                   # Deep design interview skill
     ├── webex-update/               # Send a session update to a Webex room
     ├── skills/                     # List all available skills
-    └── splunk-dashboard-gen/       # Splunk Dashboard Studio + AI background image
+    ├── splunk-dashboard-gen/       # Splunk Dashboard Studio + AI background image + live deploy
+    └── repo-status/                # Git repo sync status across local/remote branches
 ```
 
 ## Path conventions
@@ -171,3 +172,5 @@ Other key facts:
 | `grill-me` | `/grill-me [topic]` | Deep design interview |
 | `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
 | `skills` | `/skills` | List all available skills and configured MCP servers |
+| `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live |
+| `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo |
