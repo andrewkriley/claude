@@ -102,10 +102,25 @@ Generate at: `https://github.com/settings/personal-access-tokens/new`
 Configured in `settings.json.template`, applied by `setup.sh`:
 - **filesystem** — access to `~/dev/`
 - **github** — GitHub API access (requires `GITHUB_TOKEN` in `env.sh`)
+- **splunk-mcp-server** — Splunk search/query via MCP add-on (requires `SPLUNK_HOST` and `SPLUNK_TOKEN` in `env.sh`; uses `mcp-remote` with bearer token auth and `NODE_TLS_REJECT_UNAUTHORIZED=0` for self-signed cert)
 
 ### claude.ai-managed (not syncable)
 
 Gmail, Google Calendar, HuggingFace, and Slack MCP servers are authenticated via **claude.ai's cloud OAuth** and tied to the claude.ai account — not to individual machines. They are configured at claude.ai/settings and automatically available in every Claude Code session without any local setup. There is nothing to sync here.
+
+## MCP troubleshooting
+
+### `claude mcp list` only shows cloud servers
+
+This is expected. `claude mcp list` only reports cloud-managed (HTTP) servers. Local stdio servers (filesystem, github, splunk-mcp-server) connect at startup and are not listed even when healthy.
+
+### Splunk MCP connection
+
+`mcp-remote` v0.1.38 works with Splunk's bearer-token MCP add-on. Key points:
+- Splunk's MCP endpoint (`/services/mcp`) accepts `POST` with JSON-RPC and returns HTTP 200 with a valid token
+- `mcp-remote` only triggers OAuth when it receives HTTP 401 — so a correct token avoids OAuth entirely
+- The self-signed cert requires `NODE_TLS_REJECT_UNAUTHORIZED: "0"` in the server's `env` block in `settings.json`
+- If you see OAuth/405 errors, the token is likely expired — regenerate `SPLUNK_TOKEN` and re-run `./setup.sh`
 
 ## Skills quick reference
 

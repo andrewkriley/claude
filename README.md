@@ -127,6 +127,7 @@ Configured in `settings.json.template`, applied by `setup.sh`:
 
 - **filesystem** — gives Claude Code access to `~/dev/`
 - **github** — GitHub API access via `GITHUB_TOKEN`
+- **splunk-mcp-server** — Splunk search/query via MCP add-on (requires `SPLUNK_HOST` and `SPLUNK_TOKEN` in `env.sh`)
 
 ### claude.ai-managed (not syncable)
 
@@ -168,6 +169,32 @@ Every push and pull request runs two security checks via GitHub Actions:
 | Shell Security | [ShellCheck](https://www.shellcheck.net) | Static analysis of shell scripts for unsafe patterns |
 
 Both checks must pass before a PR can be merged. A nightly scheduled scan also runs against `main`.
+
+---
+
+## Troubleshooting
+
+### MCP servers not appearing in `claude mcp list`
+
+`claude mcp list` only reports cloud-managed (HTTP) MCP servers. Local stdio-based servers (filesystem, github, splunk-mcp-server) connect silently at startup and will not appear in that list even when healthy. To verify they are working, attempt to use a tool from the server inside Claude Code.
+
+### Splunk MCP: self-signed certificate error
+
+If `mcp-remote` fails to connect to the Splunk MCP endpoint with a TLS error, confirm `NODE_TLS_REJECT_UNAUTHORIZED: "0"` is present in the `splunk-mcp-server` env block in `~/.claude/settings.json`. This is written by `setup.sh` from the template — if it is missing, re-run `./setup.sh`.
+
+### Splunk MCP: OAuth registration failure (HTTP 405)
+
+`mcp-remote` only falls back to OAuth when the server returns HTTP 401. The Splunk MCP add-on returns HTTP 200 with a valid token and HTTP 401 with a bad/missing token. If you see OAuth errors (405 on registration endpoints), the bearer token in `env.sh` is likely expired or incorrect — regenerate `SPLUNK_TOKEN` and re-run `./setup.sh`.
+
+**Tested working config (mcp-remote v0.1.38):**
+```json
+"splunk-mcp-server": {
+  "command": "npx",
+  "args": ["-y", "mcp-remote", "https://SPLUNK_HOST:8089/services/mcp",
+           "--header", "Authorization: Bearer SPLUNK_TOKEN"],
+  "env": { "NODE_TLS_REJECT_UNAUTHORIZED": "0" }
+}
+```
 
 ---
 
