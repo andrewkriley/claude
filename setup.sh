@@ -110,16 +110,22 @@ SETTINGS_TEMPLATE="$REPO_DIR/settings.json.template"
 
 info "Generating $SETTINGS_FILE from template..."
 
-# Load existing GITHUB_TOKEN from env.sh if available
+# Load existing secrets from env.sh if available
 GITHUB_TOKEN_VALUE=""
+SPLUNK_HOST_VALUE=""
+SPLUNK_TOKEN_VALUE=""
 if [[ -f "$ENV_FILE" ]]; then
   GITHUB_TOKEN_VALUE=$(grep '^export GITHUB_TOKEN=' "$ENV_FILE" 2>/dev/null | sed 's/export GITHUB_TOKEN="//;s/"//' || echo "")
+  SPLUNK_HOST_VALUE=$(grep '^export SPLUNK_HOST=' "$ENV_FILE" 2>/dev/null | sed 's/export SPLUNK_HOST="//;s/"//' || echo "")
+  SPLUNK_TOKEN_VALUE=$(grep '^export SPLUNK_TOKEN=' "$ENV_FILE" 2>/dev/null | sed 's/export SPLUNK_TOKEN="//;s/"//' || echo "")
 fi
 
 # Replace placeholders in template
 sed \
   -e "s|HOMEDIR|$HOME|g" \
   -e "s|GITHUB_TOKEN_PLACEHOLDER|${GITHUB_TOKEN_VALUE:-YOUR_GITHUB_TOKEN}|g" \
+  -e "s|SPLUNK_HOST_PLACEHOLDER|${SPLUNK_HOST_VALUE:-YOUR_SPLUNK_HOST}|g" \
+  -e "s|SPLUNK_TOKEN_PLACEHOLDER|${SPLUNK_TOKEN_VALUE:-YOUR_SPLUNK_TOKEN}|g" \
   "$SETTINGS_TEMPLATE" > "$SETTINGS_FILE"
 
 info "settings.json written."
@@ -148,6 +154,8 @@ MISSING=()
 [[ -z "${GITHUB_TOKEN:-}" ]]          && MISSING+=("GITHUB_TOKEN (required for GitHub MCP)")
 [[ -z "${LINKEDIN_TOKEN:-}" ]]        && MISSING+=("LINKEDIN_TOKEN (run scripts/linkedin-oauth.sh)")
 [[ -z "${LINKEDIN_PERSON_URN:-}" ]]   && MISSING+=("LINKEDIN_PERSON_URN (run scripts/linkedin-oauth.sh)")
+[[ -z "${SPLUNK_HOST:-}" ]]           && MISSING+=("SPLUNK_HOST (required for Splunk MCP, e.g. 10.66.121.3)")
+[[ -z "${SPLUNK_TOKEN:-}" ]]          && MISSING+=("SPLUNK_TOKEN (required for Splunk MCP)")
 
 if [[ ${#MISSING[@]} -gt 0 ]]; then
   echo ""

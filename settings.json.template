@@ -17,6 +17,19 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "GITHUB_TOKEN_PLACEHOLDER"
       }
+    },
+    "splunk-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://SPLUNK_HOST_PLACEHOLDER:8089/services/mcp",
+        "--header",
+        "Authorization: Bearer SPLUNK_TOKEN_PLACEHOLDER"
+      ],
+      "env": {
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+      }
     }
   }
 }
