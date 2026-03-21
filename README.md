@@ -15,6 +15,9 @@ claude/
 ├── settings.json.template          # Template for ~/.claude/settings.json (permissions, hooks — NOT MCP servers)
 ├── env.sh.template                 # Secrets template (never commit populated version)
 ├── .gitleaks.toml                  # Gitleaks config — allowlists known false positives
+├── .claude/
+│   ├── settings.json               # Project-scoped settings
+│   └── settings.local.json         # Project-scoped permissions (WebFetch, Bash)
 ├── scripts/
 │   ├── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
 │   └── webex-oauth.sh              # One-time Webex OAuth setup
@@ -128,8 +131,7 @@ Skills are invoked inside Claude Code with `/skill-name`. They are symlinked fro
 | `summarise-session` | `/summarise-session` | Summarise the current working session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview for plans and projects |
 | `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
-| `skills` | `/skills` | List all available skills |
-| `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live |
+| `skills` | `/skills` | List all available skills and configured MCP servers |
 
 ---
 
