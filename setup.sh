@@ -109,29 +109,8 @@ SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 SETTINGS_TEMPLATE="$REPO_DIR/settings.json.template"
 
 info "Generating $SETTINGS_FILE from template..."
-
-# Load existing secrets from env.sh if available
-GITHUB_TOKEN_VALUE=""
-SPLUNK_HOST_VALUE=""
-SPLUNK_TOKEN_VALUE=""
-if [[ -f "$ENV_FILE" ]]; then
-  GITHUB_TOKEN_VALUE=$(grep '^export GITHUB_TOKEN=' "$ENV_FILE" 2>/dev/null | sed 's/export GITHUB_TOKEN="//;s/"//' || echo "")
-  SPLUNK_HOST_VALUE=$(grep '^export SPLUNK_HOST=' "$ENV_FILE" 2>/dev/null | sed 's/export SPLUNK_HOST="//;s/"//' || echo "")
-  SPLUNK_TOKEN_VALUE=$(grep '^export SPLUNK_TOKEN=' "$ENV_FILE" 2>/dev/null | sed 's/export SPLUNK_TOKEN="//;s/"//' || echo "")
-fi
-
-# Replace placeholders in template
-sed \
-  -e "s|HOMEDIR|$HOME|g" \
-  -e "s|GITHUB_TOKEN_PLACEHOLDER|${GITHUB_TOKEN_VALUE:-YOUR_GITHUB_TOKEN}|g" \
-  -e "s|SPLUNK_HOST_PLACEHOLDER|${SPLUNK_HOST_VALUE:-YOUR_SPLUNK_HOST}|g" \
-  -e "s|SPLUNK_TOKEN_PLACEHOLDER|${SPLUNK_TOKEN_VALUE:-YOUR_SPLUNK_TOKEN}|g" \
-  "$SETTINGS_TEMPLATE" > "$SETTINGS_FILE"
-
+cp "$SETTINGS_TEMPLATE" "$SETTINGS_FILE"
 info "settings.json written."
-if [[ -z "$GITHUB_TOKEN_VALUE" ]]; then
-  warn "GITHUB_TOKEN not set — edit $ENV_FILE and re-run setup.sh to apply it to settings.json."
-fi
 
 # ── Step 7: env.sh setup ──────────────────────────────────────────────────
 info "Setting up $ENV_FILE..."
@@ -144,11 +123,62 @@ else
   info "$ENV_FILE already exists — not overwriting."
 fi
 
-# Source env.sh and check what's missing
+# Source env.sh so tokens are available for MCP registration below
 set +u
 # shellcheck disable=SC1090
 source "$ENV_FILE" 2>/dev/null || true
 set -u
+
+# ── Step 8: Register MCP servers via claude CLI ────────────────────────────
+# Claude Code v2.x reads local MCP servers from ~/.claude.json (managed by
+# `claude mcp add`). The mcpServers key in ~/.claude/settings.json is ignored.
+info "Registering local MCP servers via claude CLI..."
+
+if ! command -v claude &>/dev/null; then
+  warn "claude CLI not found — skipping MCP server registration."
+  warn "Install Claude Code, then re-run setup.sh to register MCP servers."
+else
+  # Re-registers a server: removes existing entry (if any) then re-adds.
+  # This ensures tokens and config are always current after re-running setup.sh.
+  register_mcp() {
+    local name="$1"; shift
+    if claude mcp get "$name" &>/dev/null 2>&1; then
+      claude mcp remove "$name" --scope user &>/dev/null 2>&1 || true
+    fi
+    if claude mcp add --scope user "$name" "$@" &>/dev/null 2>&1; then
+      info "  Registered: $name"
+    else
+      warn "  Failed to register: $name (check token/host and re-run setup.sh)"
+    fi
+  }
+
+  # filesystem — no secrets required
+  register_mcp filesystem \
+    -- npx -y @modelcontextprotocol/server-filesystem "$HOME/dev"
+
+  # github — requires GITHUB_TOKEN
+  if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+    register_mcp github \
+      -e "GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_TOKEN" \
+      -- npx -y @modelcontextprotocol/server-github
+  else
+    warn "  Skipping github MCP — GITHUB_TOKEN not set in $ENV_FILE"
+  fi
+
+  # splunk-mcp-server — requires SPLUNK_HOST and SPLUNK_TOKEN
+  # IMPORTANT: Must use stdio + mcp-remote (not --transport http).
+  # Claude Code's HTTP transport cannot disable TLS cert verification.
+  # mcp-remote with NODE_TLS_REJECT_UNAUTHORIZED=0 is the only supported
+  # approach for Splunk's self-signed cert.
+  if [[ -n "${SPLUNK_HOST:-}" && -n "${SPLUNK_TOKEN:-}" ]]; then
+    register_mcp splunk-mcp-server \
+      -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
+      -- npx -y mcp-remote@0.1.38 "https://${SPLUNK_HOST}:8089/services/mcp" \
+      --header "Authorization: Bearer ${SPLUNK_TOKEN}"
+  else
+    warn "  Skipping splunk-mcp-server — SPLUNK_HOST or SPLUNK_TOKEN not set in $ENV_FILE"
+  fi
+fi
 
 MISSING=()
 [[ -z "${GITHUB_TOKEN:-}" ]]          && MISSING+=("GITHUB_TOKEN (required for GitHub MCP)")
@@ -168,7 +198,7 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
   warn "For LinkedIn credentials, run: $REPO_DIR/scripts/linkedin-oauth.sh"
 fi
 
-# ── Step 8: Shell integration ──────────────────────────────────────────────
+# ── Step 9: Shell integration ──────────────────────────────────────────────
 SOURCE_LINE="[ -f \"\$HOME/.claude/env.sh\" ] && source \"\$HOME/.claude/env.sh\""
 SHELL_RC=""
 if [[ "$OS" == "macos" ]]; then

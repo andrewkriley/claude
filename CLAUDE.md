@@ -19,6 +19,7 @@ cd ~/dev/claude
 - Symlink `skills/` → `~/.claude/skills/`
 - Symlink `PROFILE.md` → `~/.claude/PROFILE.md`
 - Generate `~/.claude/settings.json` from `settings.json.template`
+- **Register local MCP servers** (filesystem, github, splunk-mcp-server) via `claude mcp add --scope user` into `~/.claude.json`
 - Create `~/.claude/env.sh` from `env.sh.template` (secrets, never committed)
 - Add `env.sh` sourcing to `.zshrc` / `.bashrc`
 
@@ -44,7 +45,7 @@ git pull && ./setup.sh
 claude/
 ├── setup.sh                        # Bootstrap script (macOS + Ubuntu)
 ├── PROFILE.md                      # Voice/identity profile for content skills
-├── settings.json.template          # MCP server config template
+├── settings.json.template          # Template for ~/.claude/settings.json (permissions, hooks — NOT MCP servers)
 ├── env.sh.template                 # Secrets template (never commit populated version)
 ├── scripts/
 │   ├── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
@@ -69,6 +70,8 @@ All skills use `$HOME`-relative paths. Every machine must follow this layout:
 | `~/.claude/skills/` | Symlink → `~/dev/claude/skills/` |
 | `~/.claude/PROFILE.md` | Symlink → `~/dev/claude/PROFILE.md` |
 | `~/.claude/env.sh` | Machine-specific secrets (gitignored) |
+| `~/.claude/settings.json` | Claude Code settings: permissions, hooks (generated from template) |
+| `~/.claude.json` | **Active MCP server registry** — managed by `claude mcp add`, never edit manually |
 
 ## GitHub PAT requirements
 
@@ -94,12 +97,26 @@ Generate at: `https://github.com/settings/personal-access-tokens/new`
 
 ## MCP servers
 
-### Local (synced via this repo)
+### CRITICAL: How Claude Code v2.x registers local MCP servers
 
-Configured in `settings.json.template`, applied by `setup.sh`:
-- **filesystem** — access to `~/dev/`
-- **github** — GitHub API access (requires `GITHUB_TOKEN` in `env.sh`)
-- **splunk-mcp-server** — Splunk search/query via MCP add-on (requires `SPLUNK_HOST` and `SPLUNK_TOKEN` in `env.sh`; uses `mcp-remote` with bearer token auth and `NODE_TLS_REJECT_UNAUTHORIZED=0` for self-signed cert)
+**Claude Code v2.x (≥ 2.0) does NOT read `mcpServers` from `~/.claude/settings.json`.** Local stdio MCP servers must be registered via the `claude mcp add` CLI command. The active registry is stored in `~/.claude.json` (not `~/.claude/settings.json`).
+
+| File | Purpose | Read by Claude Code? |
+|---|---|---|
+| `~/.claude/settings.json` | Permissions, hooks, other settings | Yes |
+| `~/.claude.json` | MCP server registry (managed by `claude mcp add`) | Yes — this is the active MCP config |
+| `settings.json.template` (this repo) | Template for `~/.claude/settings.json` | No — only used by `setup.sh` |
+
+`setup.sh` registers all local MCP servers by running `claude mcp add --scope user`. You must run `setup.sh` **after** filling in `~/.claude/env.sh` for servers to be registered. Run it again whenever tokens change.
+
+To verify registration: `claude mcp list` — healthy local servers appear with `✓ Connected`.
+
+### Local servers (synced via this repo)
+
+Registered by `setup.sh` via `claude mcp add --scope user`:
+- **filesystem** — stdio, `@modelcontextprotocol/server-filesystem`, access to `~/dev/`
+- **github** — stdio, `@modelcontextprotocol/server-github`, requires `GITHUB_TOKEN` in `env.sh`
+- **splunk-mcp-server** — stdio via `mcp-remote@0.1.38`, requires `SPLUNK_HOST` and `SPLUNK_TOKEN` in `env.sh`
 
 ### claude.ai-managed (not syncable)
 
@@ -107,17 +124,36 @@ Gmail, Google Calendar, HuggingFace, and Slack MCP servers are authenticated via
 
 ## MCP troubleshooting
 
-### `claude mcp list` only shows cloud servers
+### Local servers not showing in `claude mcp list`
 
-This is expected. `claude mcp list` only reports cloud-managed (HTTP) servers. Local stdio servers (filesystem, github, splunk-mcp-server) connect at startup and are not listed even when healthy.
+Run `setup.sh` — this registers the servers. Common causes:
+1. `setup.sh` not yet run on this machine
+2. Tokens missing from `~/.claude/env.sh` at the time `setup.sh` ran (re-run after filling tokens)
+3. Pre-v2 config: `mcpServers` was manually added to `~/.claude/settings.json` — **this does nothing in Claude Code v2.x**
 
-### Splunk MCP connection
+Check registration: `claude mcp get splunk-mcp-server`. If it returns "No MCP server found", the server was never registered via the CLI.
 
-`mcp-remote` v0.1.38 works with Splunk's bearer-token MCP add-on. Key points:
-- Splunk's MCP endpoint (`/services/mcp`) accepts `POST` with JSON-RPC and returns HTTP 200 with a valid token
-- `mcp-remote` only triggers OAuth when it receives HTTP 401 — so a correct token avoids OAuth entirely
-- The self-signed cert requires `NODE_TLS_REJECT_UNAUTHORIZED: "0"` in the server's `env` block in `settings.json`
-- If you see OAuth/405 errors, the token is likely expired — regenerate `SPLUNK_TOKEN` and re-run `./setup.sh`
+### Splunk MCP server connection
+
+The Splunk MCP add-on uses a self-signed TLS cert. This means:
+
+- **Do NOT use `--transport http`** with `claude mcp add` for Splunk. Claude Code's built-in HTTP transport has no way to disable cert verification, so it will fail with a TLS error.
+- **Use stdio + `mcp-remote@0.1.38` as a proxy** with `NODE_TLS_REJECT_UNAUTHORIZED=0` set as an env var. This is the only supported approach.
+
+Correct registration command (also run by `setup.sh`):
+```bash
+claude mcp add --scope user splunk-mcp-server \
+  -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
+  -- npx -y mcp-remote@0.1.38 "https://${SPLUNK_HOST}:8089/services/mcp" \
+  --header "Authorization: Bearer ${SPLUNK_TOKEN}"
+```
+
+Other key facts:
+- Splunk's MCP endpoint (`/services/mcp`) responds to `POST` JSON-RPC with HTTP 200 for valid tokens
+- `mcp-remote` only triggers OAuth on HTTP 401 — a correct token bypasses OAuth entirely
+- The Splunk MCP server reports `protocolVersion: 2025-06-18` — this is handled transparently by `mcp-remote`
+- If you see OAuth/401 errors, the token is expired — regenerate `SPLUNK_TOKEN` in `~/.claude/env.sh` and re-run `./setup.sh`
+- After re-running `setup.sh`, restart Claude Code for the new tools to load into the session
 
 ## Skills quick reference
 
