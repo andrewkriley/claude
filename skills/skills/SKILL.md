@@ -28,3 +28,20 @@ For each skill show:
 ```
 
 If `$ARGUMENTS` was provided and no skills match, say so and suggest the closest match.
+
+## MCP Servers
+
+After listing skills, read `~/.claude/settings.json` and extract the `mcpServers` keys. Present a second section titled **MCP Servers** with two sub-groups:
+
+**Local (synced via ~/dev/claude)**
+For each key in `mcpServers`, show:
+```
+**name** — brief purpose inferred from the server name
+```
+
+**Cloud-managed (via claude.ai)**
+Always show these as a fixed list — they are authenticated via claude.ai OAuth and are not in settings.json:
+- **Gmail** — read and draft email
+- **Google Calendar** — manage calendar events
+- **HuggingFace** — search models, datasets, and papers
+- **Slack** — read and send messages

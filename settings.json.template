@@ -1,4 +1,12 @@
 {
+  "extraKnownMarketplaces": {
+    "cloudflare": {
+      "source": {
+        "source": "github",
+        "repo": "cloudflare/skills"
+      }
+    }
+  },
   "mcpServers": {
     "filesystem": {
       "command": "npx",
