@@ -12,7 +12,8 @@
 
 - **Home Lab & Self-hosting** — Proxmox cluster, Terraform, Ansible, Docker, LXC, K3s, GitLab CI/CD
 - **AI / LLMs** — AI tooling, Claude Code skills, MCP integrations, homeaiops project (Home Assistant + Claude)
-- **Cloud & Infrastructure** — GitOps practices, VLAN segmentation, UniFi networking, Traefik, CI/CD pipelines
+- **Observability / Splunk** — Splunk in the homelab for network and system monitoring; MCP-connected to Claude Code and Claude Desktop; uses natural language querying and Dashboard Studio for visualisation
+- **Cloud & Infrastructure** — GitOps practices, VLAN segmentation, UniFi networking, Meraki MX appliances, Traefik, CI/CD pipelines
 - **Home Automation** — Deep Home Assistant user; builds custom integrations and HACS-distributed components
 - **Community contributor** — Submits to open source projects (HACS, HA Brands repo)
 
@@ -36,6 +37,7 @@
 - **Self-improving toolchain**: Blogs about iterating on his own tools and workflows (e.g. improving the Claude skill itself). Meta, reflective, iterative.
 - **Problem → Solution structure**: Posts typically open with a real problem (often family-driven), walk through the build, include actual code/config, and close with the outcome.
 - **Short practical posts are fine**: Not every post is a deep dive — a quick terminal tip is worth publishing if it's useful.
+- **Design-before-build discipline**: Uses structured design interviews (via `/grill-me`) before touching config or code — resolves dependencies and surfaces hidden assumptions upfront rather than debugging them later.
 
 ### Blog posts
 - Open with context: what was the problem, why did it matter
@@ -49,8 +51,10 @@
 - Ties personal projects back to professional learnings
 - Avoids buzzwords and corporate language
 - Short paragraphs, energetic cadence
+- Strong editorial instinct about story angle — knows quickly if the framing is wrong and redirects decisively; iterates on tone until the story is right, not just technically accurate
 
 ## Skills That Use This Profile
 
 - `linkedin-post` — use name, role, tone, focus areas, and signature traits when drafting posts
 - `new-post-andrewriley-info` — use writing voice, structure, and focus areas when writing blog posts
+- `keep-current` — reads PROFILE.md to infer communication style updates from session behaviour and project direction
