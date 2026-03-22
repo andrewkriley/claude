@@ -125,6 +125,38 @@ Registered by `setup.sh` via `claude mcp add --scope user`:
 - **huggingface** — stdio via `mcp-remote@0.1.38`, requires `HF_TOKEN` in `env.sh`. Registered locally to enable `dynamic_space invoke` — the claude.ai-managed HF server uses `gradio=none` which blocks image generation.
 - **splunk-mcp-server** — stdio via `mcp-remote@0.1.38`, requires `SPLUNK_HOST` and `SPLUNK_TOKEN` in `env.sh`
 
+### Claude Desktop (machine-local, not synced)
+
+Claude Desktop uses a separate config file — `~/Library/Application Support/Claude/claude_desktop_config.json` — and does **not** share MCP config with Claude Code. This file is machine-local and not tracked in this repo.
+
+To add the Splunk MCP server to Claude Desktop, edit the config file directly:
+
+```json
+{
+  "mcpServers": {
+    "splunk-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.1.38",
+        "https://<SPLUNK_HOST>:8089/services/mcp",
+        "--header",
+        "Authorization: Bearer <SPLUNK_TOKEN>"
+      ],
+      "env": {
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+      }
+    }
+  }
+}
+```
+
+Key notes:
+- Claude Desktop does **not** source `.zshrc` or `~/.claude/env.sh` — the token must be hardcoded in the `env` block or args
+- The `--header` value and its argument must be **separate array elements**
+- Restart Claude Desktop after editing — it only reads this config at startup
+- Logs at `~/Library/Logs/Claude/mcp-server-splunk-mcp-server.log` if troubleshooting needed
+
 ### claude.ai-managed (not syncable)
 
 Gmail, Google Calendar, HuggingFace, and Slack MCP servers are authenticated via **claude.ai's cloud OAuth** and tied to the claude.ai account — not to individual machines. They are configured at claude.ai/settings and automatically available in every Claude Code session without any local setup. There is nothing to sync here.
@@ -166,7 +198,7 @@ Other key facts:
 
 | Skill | Invoke | Purpose |
 |---|---|---|
-| `new-post-andrewriley-info` | `/new-post-andrewriley-info` | Write and publish a Hugo blog post |
+| `new-post-andrewriley-info` | `/new-post-andrewriley-info` | Write and publish a Hugo blog post (uses Bash tool for date — macOS-compatible AEST/AEDT timezone offset) |
 | `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
 | `summarise-session` | `/summarise-session` | Summarise the current session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview |

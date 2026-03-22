@@ -127,7 +127,7 @@ Skills are invoked inside Claude Code with `/skill-name`. They are symlinked fro
 
 | Skill | Invoke | Purpose |
 |---|---|---|
-| `new-post-andrewriley-info` | `/new-post-andrewriley-info [topic]` | Write and publish a Hugo blog post |
+| `new-post-andrewriley-info` | `/new-post-andrewriley-info [topic]` | Write and publish a Hugo blog post (date uses macOS-compatible AEST/AEDT timezone offset) |
 | `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
 | `summarise-session` | `/summarise-session` | Summarise the current working session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview for plans and projects |
@@ -148,6 +148,34 @@ Registered by `setup.sh` via `claude mcp add --scope user` into `~/.claude.json`
 - **github** — GitHub API access via `GITHUB_TOKEN`
 - **huggingface** — local HF MCP server for image generation via `HF_TOKEN`. Required for `splunk-dashboard-gen` — the claude.ai-managed HF server has `gradio=none` which blocks image generation.
 - **splunk-mcp-server** — Splunk search/query via MCP add-on (requires `SPLUNK_HOST` and `SPLUNK_TOKEN`). Uses `mcp-remote` proxy with `NODE_TLS_REJECT_UNAUTHORIZED=0` to handle the self-signed TLS cert.
+
+### Claude Desktop (machine-local, not synced)
+
+Claude Desktop uses a separate config — `~/Library/Application Support/Claude/claude_desktop_config.json` — and does not share MCP config with Claude Code. This file is **not** tracked in this repo.
+
+To wire up the Splunk MCP server in Claude Desktop, add an `mcpServers` block:
+
+```json
+{
+  "mcpServers": {
+    "splunk-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.1.38",
+        "https://<SPLUNK_HOST>:8089/services/mcp",
+        "--header",
+        "Authorization: Bearer <SPLUNK_TOKEN>"
+      ],
+      "env": {
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+      }
+    }
+  }
+}
+```
+
+Important: Claude Desktop does not source `.zshrc` or `env.sh` — the token must be set directly in the `env` block. Restart Desktop after editing. Logs at `~/Library/Logs/Claude/mcp-server-splunk-mcp-server.log`.
 
 ### claude.ai-managed (not syncable)
 
