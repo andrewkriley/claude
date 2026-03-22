@@ -51,6 +51,7 @@ cd ~/dev/claude
 - Symlink `skills/` → `~/.claude/skills/`
 - Symlink `PROFILE.md` → `~/.claude/PROFILE.md`
 - Generate `~/.claude/settings.json` from `settings.json.template`
+- **Register local MCP servers** (filesystem, github, splunk-mcp-server, huggingface) via `claude mcp add --scope user` into `~/.claude.json`
 - Create `~/.claude/env.sh` from `env.sh.template` (secrets, never committed)
 - Add `env.sh` sourcing to `.zshrc` / `.bashrc`
 

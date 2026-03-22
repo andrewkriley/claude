@@ -47,12 +47,16 @@ claude/
 ├── PROFILE.md                      # Voice/identity profile for content skills
 ├── settings.json.template          # Template for ~/.claude/settings.json (permissions, hooks — NOT MCP servers)
 ├── env.sh.template                 # Secrets template (never commit populated version)
+├── .gitleaks.toml                  # Gitleaks config — allowlists known false positives
 ├── .claude/
 │   ├── settings.json               # Project-scoped settings
 │   └── settings.local.json         # Project-scoped permissions (WebFetch, Bash)
 ├── scripts/
 │   ├── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
 │   └── webex-oauth.sh              # One-time Webex OAuth setup
+├── .github/
+│   └── workflows/
+│       └── security.yml            # CI security scanning (Gitleaks + ShellCheck)
 └── skills/
     ├── new-post-andrewriley-info/  # Hugo blog post creation pipeline
     ├── linkedin-post/              # LinkedIn draft + publish
