@@ -61,7 +61,8 @@ claude/
     ├── webex-update/               # Send a session update to a Webex room
     ├── skills/                     # List all available skills
     ├── splunk-dashboard-gen/       # Splunk Dashboard Studio + AI background image + live deploy
-    └── repo-status/                # Git repo sync status across local/remote branches
+    ├── repo-status/                # Git repo sync status across local/remote branches
+    └── keep-current/               # Audit and sync README, CLAUDE.md, and PROFILE.md with repo state
 ```
 
 ## Path conventions
@@ -206,3 +207,4 @@ Other key facts:
 | `skills` | `/skills` | List all available skills and configured MCP servers |
 | `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live |
 | `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo |
+| `keep-current` | `/keep-current` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose updates |
