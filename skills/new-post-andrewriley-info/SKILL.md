@@ -17,11 +17,13 @@ Read `$HOME/.claude/PROFILE.md` before writing. Use it to inform the writing voi
 
 ## Current datetime
 
-```
-!`date '+%Y-%m-%dT%H:%M:%S%:z'`
+Use the Bash tool to get the current datetime with the correct local timezone offset:
+
+```bash
+date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/\([+-][0-9][0-9]\)\([0-9][0-9]\)$/\1:\2/'
 ```
 
-Use this exact value as the `date` field in the front matter. Do not round, adjust, or substitute a different time.
+This produces RFC3339 format with the correct AEST (+10:00) or AEDT (+11:00) offset depending on daylight saving time. Use the exact output as the `date` field in the front matter. Do not round, adjust, or substitute a different time.
 
 ## Recent coding context
 
