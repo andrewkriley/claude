@@ -210,12 +210,20 @@ Other key facts:
 
 | Skill | Invoke | Purpose |
 |---|---|---|
-| `new-post-andrewriley-info` | `/new-post-andrewriley-info` | Write and publish a Hugo blog post (uses Bash tool for date — macOS-compatible AEST/AEDT timezone offset) |
+| `new-post-andrewriley-info` | `/new-post-andrewriley-info [topic]` | Write and publish a Hugo blog post (uses Bash tool for date — macOS-compatible AEST/AEDT timezone offset) |
 | `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
-| `summarise-session` | `/summarise-session` | Summarise the current session |
-| `grill-me` | `/grill-me [topic]` | Deep design interview |
+| `summarise-session` | `/summarise-session [project]` | Summarise the current session |
+| `grill-me` | `/grill-me [topic]` | Structured design interview — maps design tree, resolves dependencies one question at a time, produces Shared Understanding doc |
 | `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
-| `skills` | `/skills` | List all available skills and configured MCP servers |
-| `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live |
-| `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo |
-| `keep-current` | `/keep-current` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose updates |
+| `skills` | `/skills [filter]` | List all available skills and configured MCP servers |
+| `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live (requires `SPLUNK_API_TOKEN` and local `huggingface` MCP) |
+| `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo; lists open PRs and working tree state |
+| `keep-current` | `/keep-current [focus]` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose targeted updates |
+
+### Skill notes
+
+- **Date/timezone**: `new-post-andrewriley-info` uses `date '+%Y-%m-%dT%H:%M:%S%z' | sed ...` via Bash tool — never inline `!date` in SKILL.md (doesn't support `${}` or quoted strings)
+- **SKILL.md inline `!` commands**: Do not support `${}` substitution or quoted strings — always use explicit Bash tool instructions instead
+- **`splunk-dashboard-gen` image generation**: Requires the locally registered `huggingface` MCP server (`HF_TOKEN`). The claude.ai-managed HF server uses `gradio=none` which blocks `dynamic_space invoke`
+- **`grill-me` pattern**: Reads existing config files before asking — avoids redundant questions; best used before any non-trivial config or infrastructure change
+- **`keep-current` PROFILE.md updates**: Only proposes changes supported by observable evidence from the repo and session — does not fabricate traits

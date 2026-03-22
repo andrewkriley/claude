@@ -128,17 +128,163 @@ All skills use `$HOME`-relative paths. Every machine must follow this layout:
 
 Skills are invoked inside Claude Code with `/skill-name`. They are symlinked from `skills/` into `~/.claude/skills/` by `setup.sh`.
 
+### Quick reference
+
 | Skill | Invoke | Purpose |
 |---|---|---|
-| `new-post-andrewriley-info` | `/new-post-andrewriley-info [topic]` | Write and publish a Hugo blog post (date uses macOS-compatible AEST/AEDT timezone offset) |
+| `new-post-andrewriley-info` | `/new-post-andrewriley-info [topic]` | Write and publish a Hugo blog post |
 | `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
 | `summarise-session` | `/summarise-session` | Summarise the current working session |
 | `grill-me` | `/grill-me [topic]` | Deep design interview for plans and projects |
 | `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
-| `skills` | `/skills` | List all available skills and configured MCP servers |
+| `skills` | `/skills [filter]` | List all available skills and configured MCP servers |
 | `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live |
 | `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo |
-| `keep-current` | `/keep-current` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose updates |
+| `keep-current` | `/keep-current [focus]` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose updates |
+
+---
+
+### `/new-post-andrewriley-info [topic]`
+
+Creates a new Hugo blog post for [andrewriley.info](https://andrewriley.info) from a recent coding session.
+
+**What it does:**
+1. Reads recent git history to understand what was worked on
+2. Picks a slug and title based on the topic (or infers from commits)
+3. Creates the post file at `~/dev/www-andrewriley-info/content/post/<year>/<slug>/index.md` with correct RFC3339 date (AEST/AEDT aware)
+4. Commits to `dev` branch and pushes
+5. Waits for CI/CD build, then validates the post at `https://dev.andrewriley.info/p/<slug>/`
+6. Asks whether to merge to `main` and publish live
+
+**Notes:**
+- Reads `PROFILE.md` to match Andrew's writing voice and style
+- Date uses `date '+%Y-%m-%dT%H:%M:%S%z'` via Bash tool — handles both AEST (+10:00) and AEDT (+11:00)
+- Trigger phrases: "write a post about", "blog about what we did", "create a post from our session", "document this"
+
+---
+
+### `/linkedin-post [topic]`
+
+Drafts and publishes a LinkedIn post as Andrew Riley.
+
+**What it does:**
+1. Checks LinkedIn credentials (`LINKEDIN_TOKEN`, `LINKEDIN_PERSON_URN`) from `~/.claude/env.sh`
+2. Reads `PROFILE.md` for voice, tone, and focus areas
+3. Drafts a post (150–300 words) with a strong hook, story, and takeaway
+4. Shows the draft and offers one round of revisions
+5. Publishes via LinkedIn UGC Posts API on confirmation
+
+**Notes:**
+- Requires OAuth setup: `./scripts/linkedin-oauth.sh`
+- If token is expired (401), re-run `linkedin-oauth.sh`
+- No buzzwords, no bullet walls, short paragraphs, 2–4 hashtags at the end
+
+---
+
+### `/summarise-session [project]`
+
+Produces a concise end-of-session summary covering what was worked on, what was achieved, what remains, and any blockers.
+
+**What it does:**
+- Reviews recent git history and conversation context
+- Outputs a structured summary suitable for handoff or reference
+
+---
+
+### `/grill-me [topic]`
+
+Runs a rigorous, structured design interview before touching any config or code.
+
+**What it does:**
+1. Maps the full design tree (architecture, workflow, tooling, deployment, dependencies)
+2. Works through each branch one question at a time, resolving dependencies before moving on
+3. Reads existing files (CLAUDE.md, env.sh, config) to avoid asking questions it can answer itself
+4. Produces a **Shared Understanding** document: decisions made, open questions, proposed next steps
+
+**Notes:**
+- Use before any non-trivial infrastructure or config change
+- Best for surfacing hidden assumptions early (e.g. "Claude Desktop doesn't source .zshrc")
+- Trigger: "grill me on [topic]" or "let's think through [plan]"
+
+---
+
+### `/webex-update [topic]`
+
+Posts a short session update to a Webex room.
+
+**What it does:**
+1. Searches for a Webex room by name (uses `WEBEX_TOKEN` from `~/.claude/env.sh`)
+2. Confirms the room with the user
+3. Posts a concise paragraph summarising what was worked on
+
+**Notes:**
+- Requires OAuth setup: `./scripts/webex-oauth.sh`
+- Searches both people and rooms
+
+---
+
+### `/skills [filter]`
+
+Lists all available skills and configured MCP servers.
+
+**What it does:**
+- Reads all `~/.claude/skills/*/SKILL.md` files and extracts name, description, and argument hints
+- Optionally filters by keyword
+- Lists local MCP servers from `~/.claude/settings.json` and cloud-managed servers (Gmail, Google Calendar, HuggingFace, Slack)
+
+---
+
+### `/splunk-dashboard-gen [title]`
+
+Generates a Splunk Dashboard Studio dashboard with an AI-generated background image and deploys it live.
+
+**What it does:**
+1. Takes a Splunk index and SPL query as input
+2. Runs the query via `splunk-mcp-server` to validate data
+3. Synthesises a thematic image prompt and generates a background image via HuggingFace
+4. Builds the Dashboard Studio JSON with visualisations and the generated background
+5. Wraps in an XML envelope and deploys via Splunk REST API (`/servicesNS/admin/search/data/ui/views`)
+6. Returns the live dashboard URL
+
+**Dependencies:**
+- `SPLUNK_HOST`, `SPLUNK_API_TOKEN` (or `SPLUNK_USER`/`SPLUNK_PASS`) in `~/.claude/env.sh`
+- Local `huggingface` MCP server (`HF_TOKEN`) — the claude.ai-managed HF server blocks image generation
+- Dashboards saved locally to `~/dev/claude-created-dashboards/` (not tracked in repo)
+
+---
+
+### `/repo-status [path]`
+
+Checks the full sync status of a git repository.
+
+**What it does:**
+1. Fetches all remote refs
+2. Reports each branch as in sync / local ahead / local behind / diverged
+3. Lists commits on `dev` not yet in `main` (pending merge)
+4. Lists open PRs (requires `gh` CLI)
+5. Reports working tree state and stash count
+
+**Notes:**
+- Defaults to current working directory if no path provided
+- Works across any git repo, not just this one
+
+---
+
+### `/keep-current [focus]`
+
+Audits README.md, CLAUDE.md, and PROFILE.md against the actual repo state and proposes targeted updates.
+
+**What it does:**
+1. Reads all skills on disk, recent git activity, and recent blog posts
+2. Checks skills table, MCP server sections, path conventions, and repo structure diagram for staleness
+3. Reviews PROFILE.md against evidence of Andrew's actual communication style and focus areas
+4. Presents diff-style proposals for each document
+5. Applies approved changes and optionally commits and pushes
+
+**Notes:**
+- Run after adding a new skill, script, or MCP server
+- Will not fabricate PROFILE.md traits — only proposes updates supported by observable evidence
+- Optional focus area: `skills`, `profile`, `mcp`
 
 ---
 
