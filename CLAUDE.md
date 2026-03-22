@@ -19,7 +19,7 @@ cd ~/dev/claude
 - Symlink `skills/` → `~/.claude/skills/`
 - Symlink `PROFILE.md` → `~/.claude/PROFILE.md`
 - Generate `~/.claude/settings.json` from `settings.json.template`
-- **Register local MCP servers** (filesystem, github, splunk-mcp-server) via `claude mcp add --scope user` into `~/.claude.json`
+- **Register local MCP servers** (filesystem, github, huggingface, splunk-mcp-server) via `claude mcp add --scope user` into `~/.claude.json`
 - Create `~/.claude/env.sh` from `env.sh.template` (secrets, never committed)
 - Add `env.sh` sourcing to `.zshrc` / `.bashrc`
 
@@ -52,8 +52,9 @@ claude/
 │   ├── settings.json               # Project-scoped settings
 │   └── settings.local.json         # Project-scoped permissions (WebFetch, Bash)
 ├── scripts/
-│   ├── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
-│   └── webex-oauth.sh              # One-time Webex OAuth setup
+│   ├── linkedin-oauth.sh                  # One-time LinkedIn OAuth setup
+│   ├── webex-oauth.sh                     # One-time Webex OAuth setup
+│   └── setup-claude-desktop-splunk.sh     # Configure Splunk MCP server in Claude Desktop (macOS)
 ├── .github/
 │   └── workflows/
 │       └── security.yml            # CI security scanning (Gitleaks + ShellCheck)
@@ -161,6 +162,12 @@ Key notes:
 - The `--header` value and its argument must be **separate array elements**
 - Restart Claude Desktop after editing — it only reads this config at startup
 - Logs at `~/Library/Logs/Claude/mcp-server-splunk-mcp-server.log` if troubleshooting needed
+
+To configure this automatically on any macOS machine, run:
+```bash
+./scripts/setup-claude-desktop-splunk.sh
+```
+Reads `SPLUNK_HOST` and `SPLUNK_TOKEN` from `~/.claude/env.sh` and prompts if missing. Safe to re-run.
 
 ### claude.ai-managed (not syncable)
 

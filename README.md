@@ -19,8 +19,9 @@ claude/
 │   ├── settings.json               # Project-scoped settings
 │   └── settings.local.json         # Project-scoped permissions (WebFetch, Bash)
 ├── scripts/
-│   ├── linkedin-oauth.sh           # One-time LinkedIn OAuth setup
-│   └── webex-oauth.sh              # One-time Webex OAuth setup
+│   ├── linkedin-oauth.sh                  # One-time LinkedIn OAuth setup
+│   ├── webex-oauth.sh                     # One-time Webex OAuth setup
+│   └── setup-claude-desktop-splunk.sh     # Configure Splunk MCP server in Claude Desktop (macOS)
 ├── skills/
 │   ├── new-post-andrewriley-info/  # Hugo blog post creation pipeline
 │   ├── linkedin-post/              # LinkedIn draft + publish
@@ -180,6 +181,12 @@ To wire up the Splunk MCP server in Claude Desktop, add an `mcpServers` block:
 
 Important: Claude Desktop does not source `.zshrc` or `env.sh` — the token must be set directly in the `env` block. Restart Desktop after editing. Logs at `~/Library/Logs/Claude/mcp-server-splunk-mcp-server.log`.
 
+To configure this automatically, run:
+```bash
+./scripts/setup-claude-desktop-splunk.sh
+```
+The script reads `SPLUNK_HOST` and `SPLUNK_TOKEN` from `~/.claude/env.sh` and prompts if either is missing. Safe to re-run — merges into existing config without overwriting other settings.
+
 ### claude.ai-managed (not syncable)
 
 Gmail, Google Calendar, HuggingFace, and Slack MCP servers are authenticated via claude.ai's cloud OAuth and tied to the claude.ai account. They are available in every Claude Code session automatically — no local setup required.
@@ -268,7 +275,7 @@ The `theme="dark"` attribute is required for white text on panels — setting `f
 git checkout dev
 # make changes
 git push origin dev
-# open a PR to main on GitHub — CI must pass and 1 approval required
+# open a PR to main on GitHub — CI must pass (Gitleaks + ShellCheck)
 ```
 
 Direct pushes to `main` are blocked.
