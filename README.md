@@ -275,7 +275,7 @@ The `theme="dark"` attribute is required for white text on panels — setting `f
 git checkout dev
 # make changes
 git push origin dev
-# open a PR to main on GitHub — CI must pass and 1 approval required
+# open a PR to main on GitHub — CI must pass (Gitleaks + ShellCheck)
 ```
 
 Direct pushes to `main` are blocked.
