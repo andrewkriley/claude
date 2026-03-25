@@ -172,12 +172,14 @@ Drafts and publishes a LinkedIn post as Andrew Riley.
 2. Reads `PROFILE.md` for voice, tone, and focus areas
 3. Drafts a post (150–300 words) with a strong hook, story, and takeaway
 4. Shows the draft and offers one round of revisions
-5. Publishes via LinkedIn UGC Posts API on confirmation
+5. Optionally attaches an image — AI-generated via HuggingFace or a user-provided local file
+6. Publishes via LinkedIn UGC Posts API on confirmation (3-step asset upload when an image is included)
 
 **Notes:**
 - Requires OAuth setup: `./scripts/linkedin-oauth.sh`
 - If token is expired (401), re-run `linkedin-oauth.sh`
 - No buzzwords, no bullet walls, short paragraphs, 2–4 hashtags at the end
+- AI-generated images use the local `huggingface` MCP server (`HF_TOKEN` required)
 
 ---
 

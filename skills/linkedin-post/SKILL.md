@@ -60,24 +60,125 @@ Identify the core insight, story, or value this post should convey. Good LinkedI
 - No buzzwords: "leverage", "synergy", "excited to share", "delighted to announce"
 - **Length:** 150–300 words
 
-### Step 3 — Review
+### Step 3 — Review & image option
 
 Show the draft and ask:
 - Does this capture the right angle?
 - Any details to add, change, or cut?
 
-Offer one round of revisions. Then ask the user to confirm publishing.
+Also ask: **"Would you like to include an image with this post?"** Offer three options:
+1. **AI-generated** — Claude generates one via HuggingFace based on the post topic
+2. **Provide your own** — user supplies a local file path
+3. **No image** — text-only post
 
-### Step 4 — Publish to LinkedIn
+Offer one round of revisions on the post text. Then ask the user to confirm publishing.
 
-Once the user confirms, load credentials:
+### Step 4 — Prepare image (if requested)
+
+#### Option 1 — AI-generated image
+
+Write a short image generation prompt (under 70 words) that visually represents the post topic. Requirements:
+- Dark, clean background — works as a standalone visual without competing with text
+- No circuit board traces, no text or labels, no holographic grids
+- Prefer real-world photography styles: dramatic landscapes, dark server room ambiance, macro textures, abstract smooth gradients
+- Cinematic quality — wide depth of field, subtle dramatic lighting
+
+Use the `mcp__huggingface__gr1_z_image_turbo_generate` tool:
+- `prompt`: the prompt above
+- `resolution`: `"1024x1024 ( 1:1 )"` (square works best for LinkedIn feed images)
+- `random_seed`: `true`
+- `steps`: `8`
+
+Download the returned image URL to a temp file:
 ```bash
-source $HOME/.claude/env.sh
+curl -sL "<image_url>" -o /tmp/li_post_image.png
 ```
 
-Post to LinkedIn API:
+Show the user what prompt was used and confirm they're happy with the image before proceeding.
+
+#### Option 2 — User-provided image
+
+Use the path the user supplied. If it's a relative path, resolve it against `$HOME`. Confirm the file exists:
 ```bash
-source $HOME/.claude/env.sh && curl -s -o /tmp/li_response.json -w "%{http_code}" -X POST https://api.linkedin.com/v2/ugcPosts \
+ls -lh <image_path>
+```
+
+Set `IMAGE_PATH=<image_path>` for use in Step 5.
+
+For Option 1, set `IMAGE_PATH=/tmp/li_post_image.png`.
+
+### Step 5 — Publish to LinkedIn
+
+#### With image (3-step upload)
+
+**Step 5a — Register the upload:**
+```bash
+source $HOME/.claude/env.sh && curl -s -X POST \
+  "https://api.linkedin.com/v2/assets?action=registerUpload" \
+  -H "Authorization: Bearer $LINKEDIN_TOKEN" \
+  -H "X-Restli-Protocol-Version: 2.0.0" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"registerUploadRequest\": {
+      \"recipes\": [\"urn:li:digitalmediaRecipe:feedshare-image\"],
+      \"owner\": \"$LINKEDIN_PERSON_URN\",
+      \"serviceRelationships\": [{
+        \"relationshipType\": \"OWNER\",
+        \"identifier\": \"urn:li:userGeneratedContent\"
+      }]
+    }
+  }"
+```
+
+Extract `uploadUrl` and `asset` URN from the response.
+
+**Step 5b — Upload the image binary:**
+```bash
+source $HOME/.claude/env.sh && curl -s -o /dev/null -w "%{http_code}" -X PUT \
+  "<uploadUrl>" \
+  -H "Authorization: Bearer $LINKEDIN_TOKEN" \
+  -H "media-type-family: STILLIMAGE" \
+  -H "Content-Type: image/png" \
+  --data-binary "@<IMAGE_PATH>"
+```
+
+Expect HTTP `201`. If not, stop and report the error.
+
+**Step 5c — Publish the post with image:**
+```bash
+source $HOME/.claude/env.sh && curl -s -o /tmp/li_response.json -w "%{http_code}" -X POST \
+  "https://api.linkedin.com/v2/ugcPosts" \
+  -H "Authorization: Bearer $LINKEDIN_TOKEN" \
+  -H "X-Restli-Protocol-Version: 2.0.0" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"author\": \"$LINKEDIN_PERSON_URN\",
+    \"lifecycleState\": \"PUBLISHED\",
+    \"specificContent\": {
+      \"com.linkedin.ugc.ShareContent\": {
+        \"shareCommentary\": { \"text\": \"POST_TEXT_HERE\" },
+        \"shareMediaCategory\": \"IMAGE\",
+        \"media\": [{
+          \"status\": \"READY\",
+          \"description\": { \"text\": \"POST_IMAGE_ALT_TEXT\" },
+          \"media\": \"ASSET_URN_HERE\",
+          \"title\": { \"text\": \"POST_IMAGE_TITLE\" }
+        }]
+      }
+    },
+    \"visibility\": {
+      \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"
+    }
+  }"
+```
+
+Replace `POST_TEXT_HERE`, `ASSET_URN_HERE`, `POST_IMAGE_ALT_TEXT`, and `POST_IMAGE_TITLE` with appropriate values. Escape any double quotes in the post text with `\"`.
+
+#### Without image (text-only)
+
+```bash
+source $HOME/.claude/env.sh && curl -s -o /tmp/li_response.json -w "%{http_code}" -X POST \
+  "https://api.linkedin.com/v2/ugcPosts" \
   -H "Authorization: Bearer $LINKEDIN_TOKEN" \
   -H "X-Restli-Protocol-Version: 2.0.0" \
   -H "Content-Type: application/json" \
@@ -98,7 +199,9 @@ source $HOME/.claude/env.sh && curl -s -o /tmp/li_response.json -w "%{http_code}
 
 Replace `POST_TEXT_HERE` with the approved post text (escape any double quotes with `\"`).
 
-Check the HTTP status code:
+### Step 6 — Confirm result
+
+Check the HTTP status code from the publish step:
 - `201` — success. Tell the user the post is live on LinkedIn.
 - `401` — token expired. Tell the user to re-run `$HOME/dev/claude/scripts/linkedin-oauth.sh` to refresh.
 - Any other error — show the response body from `/tmp/li_response.json` and stop.
