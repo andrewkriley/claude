@@ -211,7 +211,7 @@ Other key facts:
 | Skill | Invoke | Purpose |
 |---|---|---|
 | `new-post-andrewriley-info` | `/new-post-andrewriley-info [topic]` | Write and publish a Hugo blog post (uses Bash tool for date — macOS-compatible AEST/AEDT timezone offset) |
-| `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post |
+| `linkedin-post` | `/linkedin-post [topic]` | Draft and publish a LinkedIn post (supports AI-generated or user-provided images) |
 | `summarise-session` | `/summarise-session [project]` | Summarise the current session |
 | `grill-me` | `/grill-me [topic]` | Structured design interview — maps design tree, resolves dependencies one question at a time, produces Shared Understanding doc |
 | `webex-update` | `/webex-update [topic]` | Send a session update to a Webex room |
@@ -227,3 +227,4 @@ Other key facts:
 - **`splunk-dashboard-gen` image generation**: Requires the locally registered `huggingface` MCP server (`HF_TOKEN`). The claude.ai-managed HF server uses `gradio=none` which blocks `dynamic_space invoke`
 - **`grill-me` pattern**: Reads existing config files before asking — avoids redundant questions; best used before any non-trivial config or infrastructure change
 - **`keep-current` PROFILE.md updates**: Only proposes changes supported by observable evidence from the repo and session — does not fabricate traits
+- **`linkedin-post` image upload**: 3-step LinkedIn asset upload (register → PUT binary → post with asset URN). AI-generated images use the local `huggingface` MCP; user-provided images require a local file path.
