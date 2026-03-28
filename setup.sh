@@ -30,6 +30,11 @@ elif [[ -f /etc/os-release ]] && grep -qi ubuntu /etc/os-release; then
 fi
 info "Detected OS: $OS"
 
+if [[ "$OS" == "unknown" ]]; then
+  warn "Unrecognised OS — automatic dependency installation will be skipped."
+  warn "Ensure git, curl, python3, and Node.js >= 20 are installed before continuing."
+fi
+
 echo ""
 echo "=== Claude Resources Setup ==="
 echo "Repo: $REPO_DIR"
@@ -39,25 +44,122 @@ echo ""
 # ── Step 1: Dependencies ───────────────────────────────────────────────────
 info "Checking dependencies..."
 
-if ! command -v node &>/dev/null; then
-  warn "Node.js not found — required for MCP servers."
-  if [[ "$OS" == "macos" ]]; then
-    warn "Install with: brew install node"
+# Track whether apt-get update has been run to avoid repeating it
+APT_UPDATED=false
+apt_install() {
+  if [[ "$APT_UPDATED" == false ]]; then
+    sudo apt-get update -qq
+    APT_UPDATED=true
+  fi
+  sudo apt-get install -y "$@"
+}
+
+# curl — required for nvm install and OAuth scripts
+if ! command -v curl &>/dev/null; then
+  if [[ "$OS" == "ubuntu" ]]; then
+    info "Installing curl via apt..."
+    apt_install curl
+  elif [[ "$OS" == "macos" ]]; then
+    # curl ships with macOS; its absence likely means Xcode CLT not installed
+    warn "curl not found — install Xcode Command Line Tools: xcode-select --install"
+    error "curl is required but not found."
   else
-    warn "Install with: sudo apt install nodejs npm"
+    error "curl is required but not found. Install it manually."
   fi
 fi
 
-if ! command -v npx &>/dev/null; then
-  warn "npx not found — required for MCP servers."
-fi
-
-if ! command -v python3 &>/dev/null; then
-  warn "python3 not found — required for LinkedIn OAuth script."
-fi
-
+# git — required for cloning repos
 if ! command -v git &>/dev/null; then
-  error "git is required but not found."
+  if [[ "$OS" == "ubuntu" ]]; then
+    info "Installing git via apt..."
+    apt_install git
+  elif [[ "$OS" == "macos" ]]; then
+    # git triggers the Xcode CLT install prompt on macOS when invoked interactively,
+    # but not from a script — guide the user instead.
+    if command -v brew &>/dev/null; then
+      info "Installing git via Homebrew..."
+      brew install git
+    else
+      warn "git not found. Install Xcode Command Line Tools (xcode-select --install) or Homebrew (https://brew.sh), then re-run setup.sh."
+      error "git is required but not found."
+    fi
+  else
+    error "git is required but not found. Install it manually."
+  fi
+fi
+info "git $(git --version | awk '{print $3}') — OK"
+
+NODE_MIN_VERSION=20
+
+ensure_node() {
+  local major
+
+  # Try loading nvm in case it's installed but not yet sourced in this shell
+  export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+  # shellcheck disable=SC1091
+  [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+
+  # Check if a sufficiently new Node is already present
+  if command -v node &>/dev/null; then
+    major=$(node --version | sed 's/v//' | cut -d. -f1)
+    if [[ -n "$major" && "$major" -ge "$NODE_MIN_VERSION" ]]; then
+      info "Node.js $(node --version) — OK"
+      return 0
+    fi
+    warn "Node.js $(node --version) found but >= v${NODE_MIN_VERSION} is required — upgrading via nvm..."
+  else
+    warn "Node.js not found — installing via nvm..."
+  fi
+
+  # Install nvm if not yet available
+  if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
+    info "Installing nvm..."
+    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+    # shellcheck disable=SC1091
+    source "$NVM_DIR/nvm.sh"
+  fi
+
+  info "Installing Node.js LTS v${NODE_MIN_VERSION} via nvm..."
+  nvm install "${NODE_MIN_VERSION}"
+  nvm alias default "${NODE_MIN_VERSION}"
+  nvm use "${NODE_MIN_VERSION}"
+  info "Node.js $(node --version) installed and set as default."
+}
+
+ensure_node
+
+# Capture the Node bin directory after ensure_node so MCP servers that use
+# mcp-remote inherit a Node >= 20 path even when the system default is older.
+NODE_BIN_DIR="$(dirname "$(command -v node)")"
+
+if ! command -v npx &>/dev/null; then
+  warn "npx not found — this is unexpected if Node installed correctly."
+fi
+
+# python3 — required for LinkedIn OAuth script
+if ! command -v python3 &>/dev/null; then
+  if [[ "$OS" == "ubuntu" ]]; then
+    info "Installing python3 via apt..."
+    apt_install python3
+  elif [[ "$OS" == "macos" ]]; then
+    if command -v brew &>/dev/null; then
+      info "Installing python3 via Homebrew..."
+      brew install python3
+    else
+      warn "python3 not found — required for LinkedIn OAuth script."
+      warn "Install via Homebrew (brew install python3) or Xcode CLT (xcode-select --install)."
+    fi
+  else
+    warn "python3 not found — required for LinkedIn OAuth script. Install it manually."
+  fi
+else
+  info "python3 $(python3 --version | awk '{print $2}') — OK"
+fi
+
+# claude CLI — required for MCP server registration (Step 8)
+if ! command -v claude &>/dev/null; then
+  warn "claude CLI not found — install it, then re-run setup.sh to register MCP servers."
+  warn "Install: npm install -g @anthropic-ai/claude-code"
 fi
 
 # ── Step 2: Directory layout ───────────────────────────────────────────────
@@ -135,8 +237,7 @@ set -u
 info "Registering local MCP servers via claude CLI..."
 
 if ! command -v claude &>/dev/null; then
-  warn "claude CLI not found — skipping MCP server registration."
-  warn "Install Claude Code, then re-run setup.sh to register MCP servers."
+  warn "Skipping MCP server registration — claude CLI not found (see above)."
 else
   # Re-registers a server: removes existing entry (if any) then re-adds.
   # This ensures tokens and config are always current after re-running setup.sh.
@@ -168,8 +269,11 @@ else
   # huggingface — requires HF_TOKEN
   # Registered locally (without gradio=none) to enable dynamic_space invoke.
   # The claude.ai-managed HF server uses gradio=none which blocks invoke.
+  # NODE_BIN_DIR is injected so Claude Code uses Node >= 20 — mcp-remote@0.1.38
+  # requires Node 20+ (uses the File global absent from Node 18).
   if [[ -n "${HF_TOKEN:-}" ]]; then
     register_mcp huggingface \
+      -e "PATH=${NODE_BIN_DIR}:${PATH}" \
       -- npx -y mcp-remote@0.1.38 "https://huggingface.co/mcp" \
       --header "Authorization: Bearer ${HF_TOKEN}"
   else
@@ -184,6 +288,7 @@ else
   if [[ -n "${SPLUNK_HOST:-}" && -n "${SPLUNK_TOKEN:-}" ]]; then
     register_mcp splunk-mcp-server \
       -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
+      -e "PATH=${NODE_BIN_DIR}:${PATH}" \
       -- npx -y mcp-remote@0.1.38 "https://${SPLUNK_HOST}:8089/services/mcp" \
       --header "Authorization: Bearer ${SPLUNK_TOKEN}"
   else
@@ -212,12 +317,21 @@ fi
 
 # ── Step 9: Shell integration ──────────────────────────────────────────────
 SOURCE_LINE="[ -f \"\$HOME/.claude/env.sh\" ] && source \"\$HOME/.claude/env.sh\""
+
+# Detect the user's login shell RC file
 SHELL_RC=""
-if [[ "$OS" == "macos" ]]; then
-  SHELL_RC="$HOME/.zshrc"
-else
-  SHELL_RC="$HOME/.bashrc"
-fi
+case "${SHELL:-}" in
+  */zsh)  SHELL_RC="$HOME/.zshrc" ;;
+  */bash) SHELL_RC="$HOME/.bashrc" ;;
+  *)
+    # Fallback: macOS default is zsh (since Catalina), Linux default is bash
+    if [[ "$OS" == "macos" ]]; then
+      SHELL_RC="$HOME/.zshrc"
+    else
+      SHELL_RC="$HOME/.bashrc"
+    fi
+    ;;
+esac
 
 if [[ -f "$SHELL_RC" ]] && ! grep -qF "claude/env.sh" "$SHELL_RC"; then
   echo "" >> "$SHELL_RC"
