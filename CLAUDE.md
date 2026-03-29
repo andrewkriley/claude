@@ -70,6 +70,20 @@ claude/
     └── keep-current/               # Audit and sync README, CLAUDE.md, and PROFILE.md with repo state
 ```
 
+## Project blueprints
+
+All new repos and projects must include a `blueprint.svg` in the root that visually describes the project's intent — its components, data flow, and how the pieces connect.
+
+Blueprints follow the style established in `~/dev/claude/blueprint.svg`:
+- Dark navy background (`#0a1628`) with fine + coarse blueprint grid
+- Monospace font (`'Courier New', monospace`)
+- Blue-tone boxes with `#00d4ff` headers and `#4db8ff` / `#5588aa` body text
+- Directional arrows in blue (`#4db8ff`), cyan (`#00d4ff`), and purple (`#aa55ff`) for different relationship types
+- Title bar at top with project name, revision, and platform notes
+- Legend and stamp panel at the bottom
+
+When starting a new project, generate the blueprint before writing code. Embed it in the README directly below the intro paragraph using `![Blueprint](blueprint.svg)`.
+
 ## Path conventions
 
 All skills use `$HOME`-relative paths. Every machine must follow this layout:
