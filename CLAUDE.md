@@ -67,7 +67,8 @@ claude/
     ├── skills/                     # List all available skills
     ├── splunk-dashboard-gen/       # Splunk Dashboard Studio + AI background image + live deploy
     ├── repo-status/                # Git repo sync status across local/remote branches
-    └── keep-current/               # Audit and sync README, CLAUDE.md, and PROFILE.md with repo state
+    ├── keep-current/               # Audit and sync README, CLAUDE.md, and PROFILE.md with repo state
+    └── security-audit/             # Audit and remediate Claude's MCP access, tokens, and permissions
 ```
 
 ## Path conventions
@@ -219,6 +220,7 @@ Other key facts:
 | `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live (requires `SPLUNK_API_TOKEN` and local `huggingface` MCP) |
 | `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo; lists open PRs and working tree state |
 | `keep-current` | `/keep-current [focus]` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose targeted updates |
+| `security-audit` | `/security-audit [focus]` | Audit Claude's MCP servers, tokens, permissions, and cloud integrations for risk; guided remediation (token rotation, permission fixes, MCP removal) |
 
 ### Skill notes
 
@@ -228,3 +230,4 @@ Other key facts:
 - **`grill-me` pattern**: Reads existing config files before asking — avoids redundant questions; best used before any non-trivial config or infrastructure change
 - **`keep-current` PROFILE.md updates**: Only proposes changes supported by observable evidence from the repo and session — does not fabricate traits
 - **`linkedin-post` image upload**: 3-step LinkedIn asset upload (register → PUT binary → post with asset URN). AI-generated images use the local `huggingface` MCP; user-provided images require a local file path.
+- **`security-audit` token display**: Never prints token values — checks presence only. Reads `~/.claude.json` to list MCP server configs with Bearer tokens redacted.

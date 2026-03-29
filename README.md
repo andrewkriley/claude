@@ -31,7 +31,8 @@ claude/
 │   ├── skills/                     # List all available skills
 │   ├── splunk-dashboard-gen/       # Splunk Dashboard Studio + AI background image + live deploy
 │   ├── repo-status/                # Git repo sync status across local/remote branches
-│   └── keep-current/               # Audit and sync README, CLAUDE.md, and PROFILE.md with repo state
+│   ├── keep-current/               # Audit and sync README, CLAUDE.md, and PROFILE.md with repo state
+│   └── security-audit/             # Audit and remediate Claude's MCP access, tokens, and permissions
 └── .github/
     └── workflows/
         └── security.yml            # CI security scanning (Gitleaks + ShellCheck)
@@ -141,6 +142,7 @@ Skills are invoked inside Claude Code with `/skill-name`. They are symlinked fro
 | `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live |
 | `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo |
 | `keep-current` | `/keep-current [focus]` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose updates |
+| `security-audit` | `/security-audit [focus]` | Audit Claude's MCP servers, tokens, permissions, and cloud integrations for risk |
 
 ---
 
@@ -287,6 +289,26 @@ Audits README.md, CLAUDE.md, and PROFILE.md against the actual repo state and pr
 - Run after adding a new skill, script, or MCP server
 - Will not fabricate PROFILE.md traits — only proposes updates supported by observable evidence
 - Optional focus area: `skills`, `profile`, `mcp`
+
+---
+
+### `/security-audit [focus]`
+
+Audits everything Claude has access to and produces a risk-rated security report with remediation options.
+
+**What it does:**
+1. Inventories all local MCP servers registered via `claude mcp add`
+2. Checks which credentials are populated in `~/.claude/env.sh` (presence only — never prints values)
+3. Lists cloud-managed integrations (Gmail, Google Calendar, HuggingFace, Slack) tied to the claude.ai account
+4. Reviews permissions in `~/.claude/settings.json` and file permission on secrets files
+5. Flags any TLS bypass settings, overly broad filesystem scopes, or stale/missing tokens
+6. Rates each finding 🔴 High / 🟡 Medium / 🟢 Low / ℹ️ Info
+7. Offers guided remediations: rotate tokens, remove unused MCP servers, tighten scopes, fix file permissions
+
+**Notes:**
+- Token values are never displayed — only whether each variable is set or empty
+- Run periodically or before sharing your machine with others
+- Optional focus area: `tokens`, `mcp`, `permissions`, `files`
 
 ---
 
