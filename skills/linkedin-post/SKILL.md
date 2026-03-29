@@ -146,7 +146,7 @@ Expect HTTP `201`. If not, stop and report the error.
 
 **Step 5c — Publish the post with image:**
 ```bash
-source $HOME/.claude/env.sh && curl -s -o /tmp/li_response.json -w "%{http_code}" -X POST \
+source $HOME/.claude/env.sh && curl -s -D /tmp/li_headers.txt -o /tmp/li_response.json -w "%{http_code}" -X POST \
   "https://api.linkedin.com/v2/ugcPosts" \
   -H "Authorization: Bearer $LINKEDIN_TOKEN" \
   -H "X-Restli-Protocol-Version: 2.0.0" \
@@ -177,7 +177,7 @@ Replace `POST_TEXT_HERE`, `ASSET_URN_HERE`, `POST_IMAGE_ALT_TEXT`, and `POST_IMA
 #### Without image (text-only)
 
 ```bash
-source $HOME/.claude/env.sh && curl -s -o /tmp/li_response.json -w "%{http_code}" -X POST \
+source $HOME/.claude/env.sh && curl -s -D /tmp/li_headers.txt -o /tmp/li_response.json -w "%{http_code}" -X POST \
   "https://api.linkedin.com/v2/ugcPosts" \
   -H "Authorization: Bearer $LINKEDIN_TOKEN" \
   -H "X-Restli-Protocol-Version: 2.0.0" \
@@ -202,6 +202,18 @@ Replace `POST_TEXT_HERE` with the approved post text (escape any double quotes w
 ### Step 6 — Confirm result
 
 Check the HTTP status code from the publish step:
-- `201` — success. Tell the user the post is live on LinkedIn.
+- `201` — success. Extract the post URN and construct the URL:
+
+```bash
+# Extract the post URN from the X-Restli-Id response header
+POST_URN=$(grep -i "x-restli-id:" /tmp/li_headers.txt | tr -d '\r' | awk '{print $2}')
+echo "Post URN: $POST_URN"
+# Construct the post URL
+echo "Post URL: https://www.linkedin.com/feed/update/${POST_URN}/"
+```
+
+Tell the user the post is live and show the direct URL:
+> Post published! View it at: `https://www.linkedin.com/feed/update/<URN>/`
+
 - `401` — token expired. Tell the user to re-run `$HOME/dev/claude/scripts/linkedin-oauth.sh` to refresh.
 - Any other error — show the response body from `/tmp/li_response.json` and stop.
