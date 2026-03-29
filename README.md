@@ -4,6 +4,8 @@ Portable Claude Code resource library — skills, profile, MCP config, and scrip
 
 This repo is the canonical source of truth for `~/.claude/` across all workstations.
 
+![Architecture blueprint](blueprint.svg)
+
 ---
 
 ## Repository structure
