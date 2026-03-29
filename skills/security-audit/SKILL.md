@@ -93,7 +93,62 @@ Skip any check where the variable is empty or unset. Record HTTP status codes:
 - **401/403** — expired or invalid
 - **0/000** — unreachable (network or host issue)
 
-## Step 3 — Audit MCP server access
+## Step 3 — Audit filesystem access
+
+The `filesystem` MCP server grants Claude read/write access to `~/dev/`. Audit what is actually there.
+
+Run the following in a single Bash tool call:
+
+```bash
+echo "=FILESYSTEM_ROOT="
+ls ~/dev/
+
+echo "=REPO_LIST="
+for d in ~/dev/*/; do
+  if [ -d "$d/.git" ]; then
+    remote=$(git -C "$d" remote get-url origin 2>/dev/null || echo "(no remote)")
+    echo "  GIT: $d → $remote"
+  else
+    echo "  DIR: $d"
+  fi
+done
+
+echo "=SENSITIVE_FILES="
+# Look for files that shouldn't be accessible: secrets, keys, certs, env files
+find ~/dev -maxdepth 3 \( \
+  -name "*.pem" -o -name "*.key" -o -name "*.p12" -o -name "*.pfx" \
+  -o -name ".env" -o -name ".env.*" -o -name "*.env" \
+  -o -name "secrets.json" -o -name "credentials.json" \
+  -o -name "*.secret" -o -name "id_rsa" -o -name "id_ed25519" \
+\) 2>/dev/null | head -50
+
+echo "=GITIGNORED_BUT_PRESENT="
+# Check each git repo for files that are gitignored but exist (potential committed secrets)
+for d in ~/dev/*/; do
+  if [ -d "$d/.git" ]; then
+    ignored=$(git -C "$d" ls-files --others --ignored --exclude-standard 2>/dev/null | grep -E "\.(env|pem|key|secret|token)$" | head -5)
+    if [ -n "$ignored" ]; then
+      echo "  $d: $ignored"
+    fi
+  fi
+done
+
+echo "=ENV_FILES_IN_DEV="
+find ~/dev -maxdepth 3 -name "*.env" -o -name ".env" -o -name "env.sh" 2>/dev/null | grep -v ".git"
+
+echo "=WORLD_READABLE_SECRETS="
+# Check ~/.claude/env.sh permissions — should not be world-readable
+ls -la ~/.claude/env.sh 2>/dev/null
+ls -la ~/.claude.json 2>/dev/null
+```
+
+Assess the findings:
+- **List all repos** under `~/dev/` — note any that seem unexpected or sensitive
+- **Flag any sensitive files** (keys, certs, .env files) — these are readable by Claude via the filesystem MCP
+- **Check file permissions** on `env.sh` and `.claude.json` — should be `600` (owner read/write only)
+- **Note the blast radius** — if the filesystem MCP were misused, what could be read or modified?
+
+## Step 4 — Audit MCP server access
 
 For each registered MCP server, assess:
 
@@ -105,7 +160,7 @@ Flag anything where:
 - A token grants more permissions than necessary
 - A server is registered but never used by any skill
 
-## Step 4 — Audit claude.ai-managed integrations
+## Step 5 — Audit claude.ai-managed integrations
 
 List the known cloud OAuth integrations (these cannot be validated via token — note they require manual review at claude.ai/settings):
 
@@ -116,7 +171,7 @@ List the known cloud OAuth integrations (these cannot be validated via token —
 
 For each, note: what access it has, whether it's used by any skill, and how to revoke it if needed (claude.ai/settings → Integrations).
 
-## Step 5 — Audit skills
+## Step 6 — Audit skills
 
 For each skill in `~/dev/claude/skills/`, read its `SKILL.md` and note:
 - What external services it calls
@@ -124,7 +179,7 @@ For each skill in `~/dev/claude/skills/`, read its `SKILL.md` and note:
 - Any shell commands it runs (Bash tool usage)
 - Any potential for unintended data exfiltration (e.g. sends content to external APIs)
 
-## Step 6 — Audit GitHub PAT permissions
+## Step 7 — Audit GitHub PAT permissions
 
 Using the GitHub API response from Step 2, check:
 - Is the PAT fine-grained (scoped to specific repos) or classic (broad)?
@@ -140,7 +195,7 @@ print('type:', d.get('type'))
 "
 ```
 
-## Step 7 — Produce the report
+## Step 8 — Produce the report
 
 Write the report to `~/dev/claude/security-audit-<YYYYMMDD>.md`. Use the date from Step 1.
 
@@ -158,6 +213,7 @@ Report format:
 | Area | Status | Issues |
 |------|--------|--------|
 | MCP Servers | ✅/⚠️/❌ | <count> |
+| Filesystem Access | ✅/⚠️/❌ | <count> |
 | API Tokens | ✅/⚠️/❌ | <count> |
 | GitHub PAT | ✅/⚠️/❌ | <count> |
 | Claude.ai Integrations | ℹ️ Manual review | — |
@@ -168,6 +224,24 @@ Report format:
 ## MCP Servers
 
 <for each server: name, transport, access scope, token used, status, any flags>
+
+---
+
+## Filesystem Access
+
+**Root:** `~/dev/`
+
+### Repos and directories
+<list all items under ~/dev/ — git repos with remote URLs, non-git dirs>
+
+### Sensitive files found
+<any .env, .pem, .key, credentials files found within ~/dev/ — or "None found">
+
+### File permissions
+<permissions on ~/.claude/env.sh and ~/.claude.json — flag if not 600>
+
+### Blast radius assessment
+<what could be read or modified if filesystem MCP were misused>
 
 ---
 
