@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 510" width="1000" height="510" font-family="'Courier New', monospace">
+
+  <!-- ===== BACKGROUND ===== -->
+  <rect width="1000" height="510" fill="#0a1628"/>
+
+  <!-- Blueprint grid (fine) -->
+  <defs>
+    <pattern id="gridFine" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(30,100,180,0.18)" stroke-width="0.5"/>
+    </pattern>
+    <pattern id="gridCoarse" width="100" height="100" patternUnits="userSpaceOnUse">
+      <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(30,100,180,0.32)" stroke-width="1"/>
+    </pattern>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4db8ff"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#aa55ff"/>
+    </marker>
+    <marker id="arrowCyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#00d4ff"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="510" fill="url(#gridFine)"/>
+  <rect width="1000" height="510" fill="url(#gridCoarse)"/>
+
+  <!-- ===== TITLE BAR ===== -->
+  <rect x="0" y="0" width="1000" height="50" fill="rgba(5,15,45,0.97)" stroke="#1e5fbb" stroke-width="1"/>
+  <line x1="0" y1="50" x2="1000" y2="50" stroke="#1e90ff" stroke-width="1.5"/>
+  <text x="18" y="18" fill="#5588cc" font-size="9" letter-spacing="3">BLUEPRINT</text>
+  <text x="18" y="38" fill="#00d4ff" font-size="16" font-weight="bold" letter-spacing="2">andrewkriley / claude</text>
+  <text x="260" y="38" fill="#3a7acc" font-size="12">— Portable Claude Resource Library</text>
+  <text x="830" y="25" fill="#3a6aaa" font-size="9">REVISION 1.0 · 2026</text>
+  <text x="830" y="39" fill="#3a6aaa" font-size="9">macOS + Ubuntu · v2.x</text>
+
+  <!-- ===== BOX 1: GIT REPOSITORY ===== -->
+  <rect x="16" y="62" width="210" height="330" rx="3" fill="rgba(8,22,58,0.88)" stroke="#1e80dd" stroke-width="1.5"/>
+  <rect x="16" y="62" width="210" height="26" rx="3" fill="rgba(20,60,140,0.55)" stroke="#1e80dd" stroke-width="1.5"/>
+  <text x="121" y="79" fill="#00d4ff" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="1">GIT REPOSITORY</text>
+  <text x="121" y="96" fill="#6699bb" font-size="8" text-anchor="middle">~/dev/claude  ·  github.com/andrewkriley/claude</text>
+
+  <text x="28" y="114" fill="#4db8ff" font-size="9">▸ setup.sh</text>
+  <text x="42" y="125" fill="#5588aa" font-size="7.5">Bootstrap: macOS + Ubuntu</text>
+  <text x="28" y="140" fill="#4db8ff" font-size="9">▸ PROFILE.md</text>
+  <text x="42" y="151" fill="#5588aa" font-size="7.5">Voice + identity for skills</text>
+  <text x="28" y="166" fill="#4db8ff" font-size="9">▸ settings.json.template</text>
+  <text x="42" y="177" fill="#5588aa" font-size="7.5">Permissions + hooks template</text>
+  <text x="28" y="192" fill="#4db8ff" font-size="9">▸ env.sh.template</text>
+  <text x="42" y="203" fill="#5588aa" font-size="7.5">Secrets scaffold (never committed)</text>
+  <text x="28" y="218" fill="#4db8ff" font-size="9">▸ .gitleaks.toml</text>
+  <text x="42" y="229" fill="#5588aa" font-size="7.5">Secret scanning allowlist</text>
+
+  <!-- skills/ sub-box -->
+  <rect x="26" y="237" width="192" height="95" rx="2" fill="rgba(0,60,120,0.22)" stroke="rgba(30,110,200,0.45)" stroke-width="1"/>
+  <text x="122" y="251" fill="#4db8ff" font-size="8.5" text-anchor="middle" font-weight="bold">skills/</text>
+  <text x="34" y="264" fill="#5588aa" font-size="7.5">new-post-andrewriley-info</text>
+  <text x="34" y="275" fill="#5588aa" font-size="7.5">linkedin-post · summarise-session</text>
+  <text x="34" y="286" fill="#5588aa" font-size="7.5">grill-me · webex-update</text>
+  <text x="34" y="297" fill="#5588aa" font-size="7.5">splunk-dashboard-gen · repo-status</text>
+  <text x="34" y="308" fill="#5588aa" font-size="7.5">keep-current · skills</text>
+  <text x="34" y="322" fill="#3a6aaa" font-size="7">invoked as /skill-name inside Claude Code</text>
+
+  <text x="28" y="344" fill="#4db8ff" font-size="9">▸ scripts/</text>
+  <text x="42" y="355" fill="#5588aa" font-size="7.5">linkedin-oauth · webex-oauth</text>
+  <text x="42" y="366" fill="#5588aa" font-size="7.5">setup-claude-desktop-splunk</text>
+
+  <text x="28" y="381" fill="#4db8ff" font-size="9">▸ .github/workflows/security.yml</text>
+  <text x="42" y="392" fill="#5588aa" font-size="7.5">Gitleaks + ShellCheck CI gate</text>
+
+  <!-- ===== SETUP.SH PROCESS BOX ===== -->
+  <rect x="252" y="120" width="130" height="130" rx="3" fill="rgba(0,55,30,0.55)" stroke="#00aa55" stroke-width="1.5"/>
+  <rect x="252" y="120" width="130" height="22" rx="3" fill="rgba(0,110,55,0.45)" stroke="#00aa55" stroke-width="1.5"/>
+  <text x="317" y="135" fill="#00ff88" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="1">SETUP.SH</text>
+  <text x="317" y="155" fill="#55cc88" font-size="8" text-anchor="middle">① Clone blog repo</text>
+  <text x="317" y="168" fill="#55cc88" font-size="8" text-anchor="middle">② Symlink skills/ + PROFILE.md</text>
+  <text x="317" y="181" fill="#55cc88" font-size="8" text-anchor="middle">③ Gen settings.json</text>
+  <text x="317" y="194" fill="#55cc88" font-size="8" text-anchor="middle">④ claude mcp add --scope user</text>
+  <text x="317" y="207" fill="#55cc88" font-size="8" text-anchor="middle">⑤ Create ~/.claude/env.sh</text>
+  <text x="317" y="220" fill="#55cc88" font-size="8" text-anchor="middle">⑥ Source in .zshrc / .bashrc</text>
+  <text x="317" y="237" fill="#447755" font-size="7" text-anchor="middle">re-run to sync after git pull</text>
+
+  <!-- Sync note below -->
+  <rect x="252" y="268" width="130" height="58" rx="3" fill="rgba(0,30,60,0.55)" stroke="#1e5090" stroke-width="1"/>
+  <text x="317" y="283" fill="#3a7acc" font-size="8" font-weight="bold" text-anchor="middle">SYNC WORKFLOW</text>
+  <text x="261" y="297" fill="#2a5a99" font-size="7.5">Push: git add &amp;&amp; commit &amp;&amp; push</text>
+  <text x="261" y="309" fill="#2a5a99" font-size="7.5">Pull: git pull &amp;&amp; ./setup.sh</text>
+  <text x="261" y="321" fill="#2a5a99" font-size="7.5">main protected · PR gate</text>
+
+  <!-- ===== BOX 2: ~/.claude/ RUNTIME ===== -->
+  <rect x="408" y="62" width="250" height="330" rx="3" fill="rgba(8,22,58,0.88)" stroke="#1e80dd" stroke-width="1.5"/>
+  <rect x="408" y="62" width="250" height="26" rx="3" fill="rgba(20,60,140,0.55)" stroke="#1e80dd" stroke-width="1.5"/>
+  <text x="533" y="79" fill="#00d4ff" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="1">~/.claude/  RUNTIME</text>
+  <text x="533" y="96" fill="#6699bb" font-size="8" text-anchor="middle">Active config on each machine</text>
+
+  <text x="420" y="114" fill="#4db8ff" font-size="9">▸ skills/</text>
+  <text x="434" y="125" fill="#5588aa" font-size="7.5">Symlink → ~/dev/claude/skills/</text>
+  <text x="420" y="140" fill="#4db8ff" font-size="9">▸ PROFILE.md</text>
+  <text x="434" y="151" fill="#5588aa" font-size="7.5">Symlink → ~/dev/claude/PROFILE.md</text>
+  <text x="420" y="166" fill="#4db8ff" font-size="9">▸ settings.json</text>
+  <text x="434" y="177" fill="#5588aa" font-size="7.5">Generated from template</text>
+  <text x="434" y="188" fill="#5588aa" font-size="7.5">Permissions + hooks config</text>
+  <text x="420" y="204" fill="#4db8ff" font-size="9">▸ settings.local.json</text>
+  <text x="434" y="215" fill="#5588aa" font-size="7.5">Project: WebFetch, Bash allowed</text>
+  <text x="420" y="230" fill="#4db8ff" font-size="9">▸ env.sh</text>
+  <text x="434" y="241" fill="#5588aa" font-size="7.5">Machine secrets (gitignored)</text>
+  <text x="434" y="252" fill="#5588aa" font-size="7.5">GITHUB_TOKEN · HF_TOKEN</text>
+  <text x="434" y="263" fill="#5588aa" font-size="7.5">SPLUNK_* · LINKEDIN_* · WEBEX_*</text>
+
+  <!-- ~/.claude.json sub-box -->
+  <rect x="418" y="273" width="230" height="90" rx="2" fill="rgba(80,0,100,0.25)" stroke="rgba(170,50,220,0.55)" stroke-width="1"/>
+  <text x="533" y="287" fill="#cc66ff" font-size="8.5" text-anchor="middle" font-weight="bold">~/.claude.json  (MCP Registry)</text>
+  <text x="426" y="301" fill="#9944cc" font-size="7.5">Managed by: claude mcp add --scope user</text>
+  <text x="426" y="313" fill="#9944cc" font-size="7.5">NOT mcpServers in settings.json (v2.x)</text>
+  <text x="426" y="328" fill="#aa55dd" font-size="7.5">filesystem  ·  github</text>
+  <text x="426" y="340" fill="#aa55dd" font-size="7.5">huggingface  ·  splunk-mcp-server</text>
+  <text x="426" y="354" fill="#9944cc" font-size="7">verify: claude mcp list</text>
+
+  <text x="420" y="374" fill="#4db8ff" font-size="9">▸ CLAUDE.md  (project instructions)</text>
+  <text x="434" y="385" fill="#5588aa" font-size="7.5">Loaded into every Claude Code session</text>
+
+  <!-- ===== BOX 3: CLAUDE CODE SESSION ===== -->
+  <rect x="686" y="62" width="298" height="175" rx="3" fill="rgba(8,22,58,0.88)" stroke="#1e80dd" stroke-width="1.5"/>
+  <rect x="686" y="62" width="298" height="26" rx="3" fill="rgba(20,60,140,0.55)" stroke="#1e80dd" stroke-width="1.5"/>
+  <text x="835" y="79" fill="#00d4ff" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="1">CLAUDE CODE SESSION</text>
+  <text x="835" y="99" fill="#6699bb" font-size="8" text-anchor="middle">CLI · Desktop · Web · IDE Extension</text>
+  <text x="835" y="113" fill="#4db8ff" font-size="8" text-anchor="middle">/new-post-andrewriley-info  /linkedin-post</text>
+  <text x="835" y="125" fill="#4db8ff" font-size="8" text-anchor="middle">/summarise-session  /grill-me  /webex-update</text>
+  <text x="835" y="137" fill="#4db8ff" font-size="8" text-anchor="middle">/splunk-dashboard-gen  /repo-status</text>
+  <text x="835" y="149" fill="#4db8ff" font-size="8" text-anchor="middle">/keep-current  /skills</text>
+  <text x="835" y="163" fill="#6699bb" font-size="8" text-anchor="middle">Reads PROFILE.md → voice + tone</text>
+  <text x="835" y="175" fill="#6699bb" font-size="8" text-anchor="middle">CLAUDE.md → project instructions</text>
+  <text x="835" y="194" fill="#3a6aaa" font-size="7.5" text-anchor="middle">claude-sonnet-4-6  ·  claude-opus-4-6</text>
+  <text x="835" y="206" fill="#3a6aaa" font-size="7.5" text-anchor="middle">claude-haiku-4-5  (model selection per task)</text>
+  <text x="835" y="224" fill="#3a6aaa" font-size="7" text-anchor="middle">memory: ~/.claude/projects/…/memory/</text>
+
+  <!-- ===== BOX 4: MCP SERVERS ===== -->
+  <rect x="686" y="256" width="298" height="136" rx="3" fill="rgba(40,0,70,0.65)" stroke="#8833bb" stroke-width="1.5"/>
+  <rect x="686" y="256" width="298" height="24" rx="3" fill="rgba(80,0,120,0.5)" stroke="#8833bb" stroke-width="1.5"/>
+  <text x="835" y="272" fill="#cc55ff" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="1">MCP SERVERS</text>
+
+  <!-- Local MCP sub-box -->
+  <rect x="696" y="284" width="130" height="98" rx="2" fill="rgba(50,0,80,0.35)" stroke="rgba(140,50,200,0.45)" stroke-width="1"/>
+  <text x="761" y="296" fill="#dd88ff" font-size="7.5" text-anchor="middle" font-weight="bold">LOCAL (synced via repo)</text>
+  <text x="704" y="309" fill="#aa66dd" font-size="7.5">filesystem  ~/dev/</text>
+  <text x="704" y="321" fill="#aa66dd" font-size="7.5">github  GITHUB_TOKEN</text>
+  <text x="704" y="333" fill="#aa66dd" font-size="7.5">huggingface  HF_TOKEN</text>
+  <text x="704" y="345" fill="#aa66dd" font-size="7.5">splunk-mcp  SPLUNK_*</text>
+  <text x="704" y="357" fill="#aa66dd" font-size="7.5">(mcp-remote + TLS bypass)</text>
+  <text x="704" y="370" fill="#7744aa" font-size="7">registered: claude mcp add</text>
+  <text x="704" y="382" fill="#7744aa" font-size="7">stored: ~/.claude.json</text>
+
+  <!-- Cloud MCP sub-box -->
+  <rect x="836" y="284" width="138" height="98" rx="2" fill="rgba(50,0,80,0.35)" stroke="rgba(140,50,200,0.45)" stroke-width="1"/>
+  <text x="905" y="296" fill="#dd88ff" font-size="7.5" text-anchor="middle" font-weight="bold">CLOUD (claude.ai OAuth)</text>
+  <text x="844" y="309" fill="#aa66dd" font-size="7.5">Gmail</text>
+  <text x="844" y="321" fill="#aa66dd" font-size="7.5">Google Calendar</text>
+  <text x="844" y="333" fill="#aa66dd" font-size="7.5">HuggingFace</text>
+  <text x="844" y="345" fill="#aa66dd" font-size="7.5">Slack</text>
+  <text x="844" y="357" fill="#7744aa" font-size="7">tied to claude.ai account</text>
+  <text x="844" y="369" fill="#7744aa" font-size="7">auto-available all sessions</text>
+  <text x="844" y="382" fill="#7744aa" font-size="7">no local setup required</text>
+
+  <!-- ===== LEGEND + STAMP (bottom) ===== -->
+  <rect x="16" y="406" width="660" height="90" rx="3" fill="rgba(5,15,40,0.65)" stroke="#1e4080" stroke-width="1"/>
+
+  <!-- Legend -->
+  <text x="28" y="422" fill="#3a6aaa" font-size="8" font-weight="bold" letter-spacing="1">LEGEND</text>
+  <!-- solid arrow -->
+  <line x1="28" y1="437" x2="75" y2="437" stroke="#4db8ff" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="82" y="440" fill="#5588aa" font-size="7.5">Direct generation / output</text>
+  <!-- dashed cyan -->
+  <line x1="28" y1="453" x2="75" y2="453" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowCyan)"/>
+  <text x="82" y="456" fill="#5588aa" font-size="7.5">Symlink</text>
+  <!-- dashed purple -->
+  <line x1="28" y1="469" x2="75" y2="469" stroke="#aa55ff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowPurple)"/>
+  <text x="82" y="472" fill="#5588aa" font-size="7.5">MCP registration (claude mcp add)</text>
+
+  <text x="230" y="437" fill="#3a6aaa" font-size="7.5">Repository: github.com/andrewkriley/claude</text>
+  <text x="230" y="450" fill="#3a6aaa" font-size="7.5">Canonical source of truth for ~/.claude/ across all workstations</text>
+  <text x="230" y="463" fill="#3a6aaa" font-size="7.5">Skills are slash commands loaded by Claude Code at startup</text>
+  <text x="230" y="476" fill="#3a6aaa" font-size="7.5">CLAUDE.md provides project instructions; PROFILE.md provides voice/identity</text>
+  <text x="230" y="489" fill="#3a6aaa" font-size="7.5">env.sh holds machine secrets and is never committed to the repository</text>
+
+  <!-- Stamp -->
+  <rect x="686" y="406" width="298" height="90" rx="3" fill="rgba(5,12,35,0.5)" stroke="#1a3560" stroke-width="1" stroke-dasharray="5,2"/>
+  <text x="835" y="445" fill="rgba(20,80,180,0.55)" font-size="30" font-weight="bold" text-anchor="middle" letter-spacing="10">BLUEPRINT</text>
+  <text x="835" y="465" fill="rgba(20,80,180,0.4)" font-size="8.5" text-anchor="middle" letter-spacing="2">andrewkriley/claude  ·  REV 1.0  ·  2026</text>
+  <text x="835" y="480" fill="rgba(20,80,180,0.4)" font-size="7.5" text-anchor="middle">Portable Claude Resource Library</text>
+
+  <!-- ===== ARROWS / CONNECTORS ===== -->
+  <!-- Git Repo → setup.sh -->
+  <line x1="226" y1="195" x2="250" y2="195" stroke="#4db8ff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- setup.sh → ~/.claude/ runtime -->
+  <line x1="382" y1="195" x2="406" y2="195" stroke="#4db8ff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ~/.claude/ → Claude Code -->
+  <line x1="658" y1="160" x2="684" y2="152" stroke="#4db8ff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ~/.claude.json → MCP Servers box -->
+  <line x1="658" y1="310" x2="684" y2="320" stroke="#aa55ff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowPurple)"/>
+
+  <!-- skills/ symlink dotted indicator -->
+  <line x1="226" y1="275" x2="406" y2="120" stroke="#00d4ff" stroke-width="0.8" stroke-dasharray="4,3" marker-end="url(#arrowCyan)"/>
+
+</svg>
