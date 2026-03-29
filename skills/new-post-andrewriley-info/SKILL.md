@@ -80,6 +80,16 @@ categories:
 ---
 ```
 
+**Suggested tags** (choose 2–4 relevant to the post topic):
+- `appliedai` — practical AI applications, AI tooling, Claude Code skills, MCP integrations
+- `buildwithai` — building with AI, AI-assisted development, AI workflows
+- `homelab` — home infrastructure, self-hosting, Proxmox, Docker
+- `observability` — monitoring, logging, Splunk, alerting
+- `automation` — Home Assistant, CI/CD, scripting
+- `networking` — VLANs, UniFi, Traefik, routing
+- `ai` — general AI/LLM topics
+- `cloud` — cloud infrastructure, GitOps
+
 The `slug` field is required. Hugo derives the URL from it via the permalink rule `post = "/p/:slug/"`. Always set `slug` to the exact value chosen in Step 2.
 
 ### Step 4 — Write the post body
