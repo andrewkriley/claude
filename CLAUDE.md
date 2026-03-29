@@ -233,6 +233,7 @@ Other key facts:
 | `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live (requires `SPLUNK_API_TOKEN` and local `huggingface` MCP) |
 | `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo; lists open PRs and working tree state |
 | `keep-current` | `/keep-current [focus]` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose targeted updates |
+| `security-audit` | `/security-audit [focus]` | Audit all Claude access — MCP servers, tokens, filesystem, permissions, skills — validates token liveness and produces a dated report |
 
 ### Skill notes
 

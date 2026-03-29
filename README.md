@@ -143,6 +143,7 @@ Skills are invoked inside Claude Code with `/skill-name`. They are symlinked fro
 | `splunk-dashboard-gen` | `/splunk-dashboard-gen [title]` | Generate a Splunk Dashboard Studio dashboard with AI background image and deploy it live |
 | `repo-status` | `/repo-status [path]` | Check branch sync status across local/remote for any git repo |
 | `keep-current` | `/keep-current [focus]` | Audit README, CLAUDE.md, and PROFILE.md against actual repo state and propose updates |
+| `security-audit` | `/security-audit [focus]` | Audit all Claude access — MCP servers, tokens, filesystem, permissions, skills — and produce a dated report |
 
 ---
 
