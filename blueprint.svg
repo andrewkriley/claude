@@ -53,9 +53,8 @@
   <!-- skills/ sub-box -->
   <rect x="26" y="237" width="192" height="95" rx="2" fill="rgba(0,60,120,0.22)" stroke="rgba(30,110,200,0.45)" stroke-width="1"/>
   <text x="122" y="251" fill="#4db8ff" font-size="8.5" text-anchor="middle" font-weight="bold">skills/</text>
-  <text x="34" y="264" fill="#5588aa" font-size="7.5">new-post-andrewriley-info</text>
-  <text x="34" y="275" fill="#5588aa" font-size="7.5">linkedin-post · summarise-session</text>
-  <text x="34" y="286" fill="#5588aa" font-size="7.5">grill-me · webex-update</text>
+  <text x="34" y="264" fill="#5588aa" font-size="7.5">linkedin-post · summarise-session</text>
+  <text x="34" y="275" fill="#5588aa" font-size="7.5">grill-me · webex-update</text>
   <text x="34" y="297" fill="#5588aa" font-size="7.5">splunk-dashboard-gen · repo-status</text>
   <text x="34" y="308" fill="#5588aa" font-size="7.5">keep-current · skills</text>
   <text x="34" y="322" fill="#3a6aaa" font-size="7">invoked as /skill-name inside Claude Code</text>
@@ -123,10 +122,9 @@
   <rect x="686" y="62" width="298" height="26" rx="3" fill="rgba(20,60,140,0.55)" stroke="#1e80dd" stroke-width="1.5"/>
   <text x="835" y="79" fill="#00d4ff" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="1">CLAUDE CODE SESSION</text>
   <text x="835" y="99" fill="#6699bb" font-size="8" text-anchor="middle">CLI · Desktop · Web · IDE Extension</text>
-  <text x="835" y="113" fill="#4db8ff" font-size="8" text-anchor="middle">/new-post-andrewriley-info  /linkedin-post</text>
-  <text x="835" y="125" fill="#4db8ff" font-size="8" text-anchor="middle">/summarise-session  /grill-me  /webex-update</text>
-  <text x="835" y="137" fill="#4db8ff" font-size="8" text-anchor="middle">/splunk-dashboard-gen  /repo-status</text>
-  <text x="835" y="149" fill="#4db8ff" font-size="8" text-anchor="middle">/keep-current  /skills</text>
+  <text x="835" y="113" fill="#4db8ff" font-size="8" text-anchor="middle">/linkedin-post  /summarise-session  /grill-me</text>
+  <text x="835" y="125" fill="#4db8ff" font-size="8" text-anchor="middle">/webex-update  /repo-status</text>
+  <text x="835" y="137" fill="#4db8ff" font-size="8" text-anchor="middle">/splunk-dashboard-gen  /keep-current  /skills</text>
   <text x="835" y="163" fill="#6699bb" font-size="8" text-anchor="middle">Reads PROFILE.md → voice + tone</text>
   <text x="835" y="175" fill="#6699bb" font-size="8" text-anchor="middle">CLAUDE.md → project instructions</text>
   <text x="835" y="194" fill="#3a6aaa" font-size="7.5" text-anchor="middle">claude-sonnet-4-6  ·  claude-opus-4-6</text>

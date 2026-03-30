@@ -167,18 +167,7 @@ info "Creating directory layout..."
 mkdir -p "$DEV_DIR"
 mkdir -p "$CLAUDE_DIR"
 
-# ── Step 3: Clone blog repo ────────────────────────────────────────────────
-BLOG_DIR="$DEV_DIR/www-andrewriley-info"
-if [[ -d "$BLOG_DIR/.git" ]]; then
-  info "Blog repo already cloned at $BLOG_DIR — pulling latest..."
-  git -C "$BLOG_DIR" pull --ff-only 2>/dev/null || warn "Could not auto-pull blog repo (uncommitted changes?)"
-else
-  info "Cloning blog repo to $BLOG_DIR..."
-  git clone https://github.com/andrewkriley/www-andrewriley-info.git "$BLOG_DIR" || \
-    warn "Could not clone blog repo — check your GitHub access and try manually: git clone https://github.com/andrewkriley/www-andrewriley-info.git $BLOG_DIR"
-fi
-
-# ── Step 4: Symlink skills ─────────────────────────────────────────────────
+# ── Step 3: Symlink skills ─────────────────────────────────────────────────
 SKILLS_TARGET="$CLAUDE_DIR/skills"
 SKILLS_SOURCE="$REPO_DIR/skills"
 
@@ -192,7 +181,7 @@ fi
 ln -s "$SKILLS_SOURCE" "$SKILLS_TARGET"
 info "Skills linked: $SKILLS_SOURCE → $SKILLS_TARGET"
 
-# ── Step 5: Symlink PROFILE.md ─────────────────────────────────────────────
+# ── Step 4: Symlink PROFILE.md ─────────────────────────────────────────────
 PROFILE_TARGET="$CLAUDE_DIR/PROFILE.md"
 PROFILE_SOURCE="$REPO_DIR/PROFILE.md"
 
@@ -206,7 +195,7 @@ fi
 ln -s "$PROFILE_SOURCE" "$PROFILE_TARGET"
 info "PROFILE.md linked: $PROFILE_SOURCE → $PROFILE_TARGET"
 
-# ── Step 6: Generate settings.json ────────────────────────────────────────
+# ── Step 5: Generate settings.json ────────────────────────────────────────
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 SETTINGS_TEMPLATE="$REPO_DIR/settings.json.template"
 
@@ -214,7 +203,7 @@ info "Generating $SETTINGS_FILE from template..."
 cp "$SETTINGS_TEMPLATE" "$SETTINGS_FILE"
 info "settings.json written."
 
-# ── Step 7: env.sh setup ──────────────────────────────────────────────────
+# ── Step 6: env.sh setup ──────────────────────────────────────────────────
 info "Setting up $ENV_FILE..."
 
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -231,7 +220,7 @@ set +u
 source "$ENV_FILE" 2>/dev/null || true
 set -u
 
-# ── Step 8: Register MCP servers via claude CLI ────────────────────────────
+# ── Step 7: Register MCP servers via claude CLI ────────────────────────────
 # Claude Code v2.x reads local MCP servers from ~/.claude.json (managed by
 # `claude mcp add`). The mcpServers key in ~/.claude/settings.json is ignored.
 info "Registering local MCP servers via claude CLI..."
@@ -315,7 +304,7 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
   warn "For LinkedIn credentials, run: $REPO_DIR/scripts/linkedin-oauth.sh"
 fi
 
-# ── Step 9: Shell integration ──────────────────────────────────────────────
+# ── Step 8: Shell integration ──────────────────────────────────────────────
 SOURCE_LINE="[ -f \"\$HOME/.claude/env.sh\" ] && source \"\$HOME/.claude/env.sh\""
 
 # Detect the user's login shell RC file
@@ -350,7 +339,6 @@ info "Skills available:    $SKILLS_TARGET"
 info "Profile:             $PROFILE_TARGET"
 info "MCP config:          $SETTINGS_FILE"
 info "Secrets:             $ENV_FILE"
-info "Blog repo:           $BLOG_DIR"
 echo ""
 info "Restart Claude Code for MCP and skill changes to take effect."
 echo ""

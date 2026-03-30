@@ -68,7 +68,7 @@ Output a structured session summary in this format:
 ### Step 3 — Offer next actions
 
 Ask the user if they'd like to:
-- **Write a blog post** about this session → invoke `new-post-andrewriley-info`
+- **Write a blog post** about this session → invoke `/new-post-andrewriley-info` from the `~/dev/www-andrewriley-info` project
 - **Share on LinkedIn** → invoke `linkedin-post`
 - **Save the summary** to a file in the project directory
 - **Nothing, just the summary** — stop here
