@@ -56,5 +56,5 @@
 ## Skills That Use This Profile
 
 - `linkedin-post` — use name, role, tone, focus areas, and signature traits when drafting posts
-- `new-post-andrewriley-info` — use writing voice, structure, and focus areas when writing blog posts
+- `new-post-andrewriley-info` (in `~/dev/www-andrewriley-info`) — use writing voice, structure, and focus areas when writing blog posts
 - `keep-current` — reads PROFILE.md to infer communication style updates from session behaviour and project direction
