@@ -1,0 +1,139 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag matches VERSION file
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          if [[ "$TAG" != "$VERSION" ]]; then
+            echo "ERROR: Tag 'v${TAG}' does not match VERSION file ('${VERSION}')"
+            exit 1
+          fi
+          echo "Tag v${TAG} matches VERSION file"
+
+      - name: Determine version and previous tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+          PREV_TAG="$(git tag --sort=-v:refname \
+            | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+            | grep -v "^${TAG}$" \
+            | head -1 || true)"
+
+          if [[ -z "$PREV_TAG" ]]; then
+            echo "prev_tag=" >> "$GITHUB_OUTPUT"
+            echo "range=HEAD" >> "$GITHUB_OUTPUT"
+          else
+            echo "prev_tag=${PREV_TAG}" >> "$GITHUB_OUTPUT"
+            echo "range=${PREV_TAG}..HEAD" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          PREV_TAG: ${{ steps.version.outputs.prev_tag }}
+          RANGE: ${{ steps.version.outputs.range }}
+        run: |
+          mapfile -t COMMITS < <(git log "$RANGE" \
+            --pretty=format:"%s" \
+            --no-merges \
+            | grep -v "^chore: release v")
+
+          declare -a FEAT FIXES REFACTOR CHORE DOCS CI OTHER
+
+          for MSG in "${COMMITS[@]}"; do
+            case "$MSG" in
+              feat*)     FEAT+=("$MSG")     ;;
+              fix*)      FIXES+=("$MSG")    ;;
+              refactor*) REFACTOR+=("$MSG") ;;
+              docs*)     DOCS+=("$MSG")     ;;
+              ci*)       CI+=("$MSG")       ;;
+              chore*)    CHORE+=("$MSG")    ;;
+              *)         OTHER+=("$MSG")    ;;
+            esac
+          done
+
+          BODY=""
+
+          if [[ ${#FEAT[@]} -gt 0 ]]; then
+            BODY+="### Features\n"
+            for M in "${FEAT[@]}"; do BODY+="- ${M}\n"; done
+            BODY+="\n"
+          fi
+
+          if [[ ${#FIXES[@]} -gt 0 ]]; then
+            BODY+="### Bug Fixes\n"
+            for M in "${FIXES[@]}"; do BODY+="- ${M}\n"; done
+            BODY+="\n"
+          fi
+
+          if [[ ${#REFACTOR[@]} -gt 0 ]]; then
+            BODY+="### Refactoring\n"
+            for M in "${REFACTOR[@]}"; do BODY+="- ${M}\n"; done
+            BODY+="\n"
+          fi
+
+          if [[ ${#DOCS[@]} -gt 0 ]]; then
+            BODY+="### Documentation\n"
+            for M in "${DOCS[@]}"; do BODY+="- ${M}\n"; done
+            BODY+="\n"
+          fi
+
+          if [[ ${#CI[@]} -gt 0 ]]; then
+            BODY+="### CI\n"
+            for M in "${CI[@]}"; do BODY+="- ${M}\n"; done
+            BODY+="\n"
+          fi
+
+          if [[ ${#CHORE[@]} -gt 0 ]]; then
+            BODY+="### Chores\n"
+            for M in "${CHORE[@]}"; do BODY+="- ${M}\n"; done
+            BODY+="\n"
+          fi
+
+          if [[ ${#OTHER[@]} -gt 0 ]]; then
+            BODY+="### Other Changes\n"
+            for M in "${OTHER[@]}"; do BODY+="- ${M}\n"; done
+            BODY+="\n"
+          fi
+
+          if [[ -z "$BODY" ]]; then
+            BODY="No user-facing changes in this release.\n"
+          fi
+
+          if [[ -n "$PREV_TAG" ]]; then
+            BODY+="**Full diff:** [\`${PREV_TAG}...${TAG}\`](https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${TAG})\n"
+          fi
+
+          printf "%b" "$BODY" > /tmp/changelog.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          gh release create "$TAG" \
+            --title "Release $TAG" \
+            --notes-file /tmp/changelog.md \
+            --verify-tag
