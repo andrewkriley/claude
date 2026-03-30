@@ -335,6 +335,10 @@ fi
 echo ""
 echo "=== Setup complete ==="
 echo ""
+if [[ -f "$REPO_DIR/VERSION" ]]; then
+  REPO_VERSION="$(tr -d '[:space:]' < "$REPO_DIR/VERSION")"
+  info "Version:             v$REPO_VERSION"
+fi
 info "Skills available:    $SKILLS_TARGET"
 info "Profile:             $PROFILE_TARGET"
 info "MCP config:          $SETTINGS_FILE"

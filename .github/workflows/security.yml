@@ -38,3 +38,19 @@ jobs:
         with:
           scandir: "."
           severity: warning
+
+  version:
+    name: Version Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate VERSION is valid SemVer
+        run: |
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ERROR: VERSION file contains invalid SemVer: '$VERSION'"
+            exit 1
+          fi
+          echo "VERSION=$VERSION (valid)"
